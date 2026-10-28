@@ -176,7 +176,7 @@
           <!-- 學生公仔圖層 (無外框圓圈，純公仔立體小人) -->
           <div id="team-pins-layer" class="absolute inset-0 pointer-events-none"></div>
 
-          <!-- 系主任慢速巡山 NPC (過渡拉長為 4 秒，間隔 14 秒) -->
+          <!-- 系主任慢速巡山 NPC (依真實照片繪製：俐落短油頭、深灰西裝與深藍襯衫) -->
           <div id="director-npc" class="absolute pointer-events-auto cursor-pointer z-30" style="left: 420px; top: 230px; transform: translate(-50%, -100%); transition: left 4s ease-in-out, top 4s ease-in-out;">
             <!-- 主任打氣氣泡 -->
             <div class="speech-bubble relative -top-2 bg-amber-400 text-slate-900 text-[11px] font-black px-3 py-1.5 rounded-2xl shadow-lg border-2 border-white whitespace-nowrap">
@@ -184,40 +184,50 @@
               <div class="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-amber-400 rotate-45 border-r-2 border-b-2 border-white"></div>
             </div>
             
-            <!-- 主任立體公仔小人（澎捲髮 + 黑框眼鏡 + 橘背心，完全符合附圖風格） -->
+            <!-- 主任公仔造型：俐落短黑髮、自信微笑單眼皮、深灰西裝與深藍襯衫 -->
             <div class="flex flex-col items-center select-none">
-              <svg width="42" height="60" viewBox="0 0 50 72" class="drop-shadow-lg">
-                <!-- 捲捲黑頭髮 -->
-                <path d="M 14,22 C 10,18 10,10 16,8 C 18,3 27,2 32,5 C 38,2 45,6 44,13 C 48,16 48,24 41,26 C 36,28 17,27 14,22 Z" fill="#1e1e24"/>
-                <!-- 圓頭部 (木偶膚色) -->
-                <circle cx="28" cy="22" r="14" fill="#fbd5b5"/>
-                <!-- 腮紅 -->
-                <ellipse cx="19" cy="25" rx="2.5" ry="1.5" fill="#f87171" opacity="0.7"/>
-                <ellipse cx="37" cy="25" rx="2.5" ry="1.5" fill="#f87171" opacity="0.7"/>
-                <!-- 黑框眼鏡與雙眼 -->
-                <circle cx="21" cy="20" r="4.5" fill="none" stroke="#1e1e24" stroke-width="2"/>
-                <circle cx="35" cy="20" r="4.5" fill="none" stroke="#1e1e24" stroke-width="2"/>
-                <line x1="25.5" y1="20" x2="30.5" y2="20" stroke="#1e1e24" stroke-width="2"/>
-                <circle cx="21" cy="20" r="1.5" fill="#1e1e24"/>
-                <circle cx="35" cy="20" r="1.5" fill="#1e1e24"/>
-                <!-- 親切微笑 -->
-                <path d="M 25,27 Q 28,30 31,27" fill="none" stroke="#8c4a2f" stroke-width="1.8" stroke-linecap="round"/>
+              <svg width="42" height="62" viewBox="0 0 50 74" class="drop-shadow-lg">
+                <!-- 帥氣俐落短黑油頭（照片旁分漸層感） -->
+                <path d="M 14,18 C 11,13 13,6 20,4 C 26,2 35,3 41,7 C 44,10 44,17 38,19 C 32,20 18,21 14,18 Z" fill="#1c1917"/>
+                <path d="M 12,17 C 11,21 14,23 15,23 C 14,18 15,15 17,14 Z" fill="#1c1917"/>
                 
-                <!-- 身體：白襯衫底 + 橘色領巾/背心 (附圖風格) -->
-                <rect x="20" y="34" width="16" height="18" rx="4" fill="#f97316"/>
-                <rect x="25" y="34" width="6" height="18" fill="#ffffff"/>
-                <!-- 胸前小徽章 -->
-                <circle cx="32" cy="39" r="2" fill="#06b6d4"/>
-                <!-- 手臂 -->
-                <rect x="14" y="35" width="5" height="14" rx="2.5" fill="#ffffff"/>
-                <rect x="37" y="35" width="5" height="14" rx="2.5" fill="#ffffff"/>
-                <!-- 雙腿 (黑長褲 + 白鞋) -->
-                <rect x="21" y="52" width="6" height="14" rx="2" fill="#1e293b"/>
-                <rect x="29" y="52" width="6" height="14" rx="2" fill="#1e293b"/>
-                <rect x="20" y="66" width="7" height="4" rx="1.5" fill="#ffffff"/>
-                <rect x="29" y="66" width="7" height="4" rx="1.5" fill="#ffffff"/>
+                <!-- 挺拔圓臉 (自然木偶膚色) -->
+                <circle cx="28" cy="22" r="13" fill="#fed7aa"/>
+                
+                <!-- 眉毛與單眼皮神韻（照片自信帥氣神態） -->
+                <path d="M 17,14 Q 22,13 25,15" fill="none" stroke="#292524" stroke-width="2" stroke-linecap="round"/>
+                <path d="M 31,15 Q 34,13 39,14" fill="none" stroke="#292524" stroke-width="2" stroke-linecap="round"/>
+                
+                <ellipse cx="21" cy="18" rx="2" ry="1.2" fill="#1c1917"/>
+                <ellipse cx="35" cy="18" rx="2" ry="1.2" fill="#1c1917"/>
+                
+                <!-- 淡紅健康腮紅 -->
+                <ellipse cx="16" cy="23" rx="2.5" ry="1.3" fill="#f87171" opacity="0.6"/>
+                <ellipse cx="40" cy="23" rx="2.5" ry="1.3" fill="#f87171" opacity="0.6"/>
+                
+                <!-- 親切燦爛微笑（照片笑容神韻） -->
+                <path d="M 23,26 Q 28,30 33,26" fill="none" stroke="#78350f" stroke-width="1.8" stroke-linecap="round"/>
+                
+                <!-- 身體：深藍色內搭襯衫 + 深灰雅痞西裝外套 -->
+                <!-- 內搭深藍襯衫領口 -->
+                <polygon points="25,35 31,35 28,42" fill="#1e3a8a"/>
+                <!-- 深灰色西裝外套本體 -->
+                <path d="M 18,35 C 16,36 15,48 15,53 L 41,53 C 41,48 40,36 38,35 L 32,45 L 24,45 Z" fill="#475569"/>
+                <!-- 西裝翻領 -->
+                <path d="M 18,35 L 25,46 L 22,46 Z" fill="#334155"/>
+                <path d="M 38,35 L 31,46 L 34,46 Z" fill="#334155"/>
+                
+                <!-- 西裝手臂 -->
+                <rect x="11" y="36" width="5.5" height="15" rx="2.5" fill="#475569"/>
+                <rect x="39.5" y="36" width="5.5" height="15" rx="2.5" fill="#475569"/>
+                
+                <!-- 筆挺黑長褲與黑皮鞋 -->
+                <rect x="19" y="53" width="7" height="14" rx="1.5" fill="#1e293b"/>
+                <rect x="30" y="53" width="7" height="14" rx="1.5" fill="#1e293b"/>
+                <rect x="18" y="67" width="8" height="4" rx="1.5" fill="#0f172a"/>
+                <rect x="30" y="67" width="8" height="4" rx="1.5" fill="#0f172a"/>
               </svg>
-              <span class="mt-0.5 bg-amber-700 text-white text-[9px] px-1.5 py-0.2 rounded-full font-bold shadow-xs">系主任</span>
+              <span class="mt-0.5 bg-slate-800 text-amber-300 border border-amber-300/40 text-[9px] px-2 py-0.2 rounded-full font-bold shadow-xs">系主任</span>
             </div>
           </div>
 
@@ -466,7 +476,7 @@
       { id: "112175310", name: "葉昱完", grade: "112級", certs: [{ name: "TBSA商務企劃初階", date: "2025/05/29" }] },
       { id: "112175311", name: "詹云鳶", grade: "112級", certs: [] },
       { id: "112175312", name: "黃梧傑", grade: "112級", certs: [
-        { name: "金融市場常識與職業道德", date: "2024/08/01" }, { name: "人生保險業務員", date: "2024/08/01" },
+        { name: "金融市場常識與職業道德", date: "2024/08/01" }, { name: "人身保險業務員", date: "2024/08/01" },
         { name: "投資型保險商品業務員", date: "2025/04/20" }, { name: "TBSA商務企劃初階", date: "2025/05/29" }
       ]},
       { id: "112175313", name: "楊礎安", grade: "112級", certs: [] },
@@ -689,7 +699,6 @@
         { x: 420, y: 95 }
       ];
 
-      // 每 14 秒才悠閒換點一次
       setInterval(() => {
         const target = waypoints[Math.floor(Math.random() * waypoints.length)];
         const jitterX = (Math.random() * 30) - 15;
@@ -709,26 +718,18 @@
     // ================= 3. 純立體手繪公仔人物 SVG 生成函式 (無外框圓形) =================
     function createFigureSVG(genderType, shirtColor) {
       if (genderType === 'female') {
-        // 齊肩黑髮、粉嫩腮紅、雙腿公仔 (附圖左側女學生風格)
         return `
           <svg width="28" height="46" viewBox="0 0 36 58" class="char-figure drop-shadow-md">
-            <!-- 齊肩黑髮 -->
             <path d="M 10,16 C 6,10 8,3 18,3 C 28,3 30,10 26,16 C 29,20 28,30 25,32 C 22,25 24,18 24,18 C 22,19 14,19 12,18 C 12,18 14,25 11,32 C 8,30 7,20 10,16 Z" fill="#18181b"/>
-            <!-- 圓臉 -->
             <circle cx="18" cy="17" r="10" fill="#fed7aa"/>
-            <!-- 腮紅 -->
             <ellipse cx="12" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
             <ellipse cx="24" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
-            <!-- 笑眼與微翹嘴巴 -->
             <path d="M 13,15 Q 15,13 17,15" fill="none" stroke="#27272a" stroke-width="1.6" stroke-linecap="round"/>
             <path d="M 19,15 Q 21,13 23,15" fill="none" stroke="#27272a" stroke-width="1.6" stroke-linecap="round"/>
             <path d="M 16,21 Q 18,23 20,21" fill="none" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>
-            <!-- 上衣 (依年級專屬色彩) -->
             <rect x="12" y="27" width="12" height="15" rx="3.5" fill="${shirtColor}"/>
-            <!-- 手臂 -->
             <rect x="8" y="28" width="3.5" height="11" rx="1.7" fill="#fed7aa"/>
             <rect x="24.5" y="28" width="3.5" height="11" rx="1.7" fill="#fed7aa"/>
-            <!-- 雙腿 (淺灰長褲 + 小鞋) -->
             <rect x="13" y="42" width="4" height="11" rx="1" fill="#e2e8f0"/>
             <rect x="19" y="42" width="4" height="11" rx="1" fill="#e2e8f0"/>
             <rect x="12" y="53" width="5" height="3" rx="1" fill="#1e293b"/>
@@ -736,27 +737,18 @@
           </svg>
         `;
       } else {
-        // 微捲黑髮、黑框眼鏡、年級上衣與黑長褲 (附圖右側風格)
         return `
           <svg width="28" height="48" viewBox="0 0 36 60" class="char-figure drop-shadow-md">
-            <!-- 捲黑髮 -->
             <path d="M 10,14 C 7,11 8,5 13,4 C 15,1 21,1 24,3 C 28,1 33,5 31,10 C 34,12 34,17 29,19 C 25,20 12,20 10,14 Z" fill="#18181b"/>
-            <!-- 圓臉 -->
             <circle cx="20" cy="16" r="10.5" fill="#fbd5b5"/>
-            <!-- 腮紅 -->
             <ellipse cx="13" cy="18" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
             <ellipse cx="27" cy="18" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
-            <!-- 眼睛 -->
             <circle cx="15" cy="15" r="1.5" fill="#18181b"/>
             <circle cx="25" cy="15" r="1.5" fill="#18181b"/>
-            <!-- 笑嘴 -->
             <path d="M 18,20 Q 20,22 22,20" fill="none" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>
-            <!-- 身體上衣 -->
             <rect x="13" y="27" width="14" height="16" rx="3.5" fill="${shirtColor}"/>
-            <!-- 手臂 -->
             <rect x="9" y="28" width="4" height="12" rx="2" fill="#ffffff"/>
             <rect x="27" y="28" width="4" height="12" rx="2" fill="#ffffff"/>
-            <!-- 長褲與白鞋 -->
             <rect x="14" y="43" width="4.5" height="12" rx="1" fill="#1e293b"/>
             <rect x="21.5" y="43" width="4.5" height="12" rx="1" fill="#1e293b"/>
             <rect x="13.5" y="55" width="5" height="3" rx="1" fill="#ffffff"/>
@@ -836,7 +828,7 @@
       renderTeamRoster(list);
     }
 
-    // 渲染公仔小人標籤 (無圓圈純人物圖案)
+    // 渲染公仔小人標籤 (無外框圓形，純立體公仔小人)
     function renderTeamPins(list) {
       const layer = document.getElementById('team-pins-layer');
       layer.innerHTML = '';
@@ -852,7 +844,6 @@
         const leftX = Math.max(70, Math.min(730, baseX + jitter));
 
         const conf = GRADE_COLORS[st.grade] || { badge: 'bg-slate-700', shirt: '#64748b' };
-        // 依學號或姓名自動分派男女公仔造型
         const isFemale = (st.name.charCodeAt(st.name.length - 1) % 2 === 0);
         const figureHtml = createFigureSVG(isFemale ? 'female' : 'male', conf.shirt);
 
@@ -862,7 +853,6 @@
         pin.style.top = `${topY}px`;
         pin.onclick = () => openStudentModal(st);
 
-        // 純公仔人物小人 + 頭頂簡潔名牌
         pin.innerHTML = `
           <div class="flex flex-col items-center">
             <div class="px-1.5 py-0.2 rounded-full text-[9px] font-black text-white shadow-xs whitespace-nowrap mb-0.5 ${conf.badge}">
