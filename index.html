@@ -30,16 +30,25 @@
       100% { transform: translateY(540px) translateX(-20px); opacity: 0.2; }
     }
 
-    /* 氣泡彈跳動畫 */
+    /* 主任打氣氣泡緩慢浮動 */
     @keyframes bubbleFloat {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-5px); }
+      50% { transform: translateY(-4px); }
     }
     .speech-bubble {
-      animation: bubbleFloat 3s ease-in-out infinite;
+      animation: bubbleFloat 4s ease-in-out infinite;
     }
 
-    /* 手繪山岳粗糙濾鏡感 */
+    /* 人物小人踏步微擺動 */
+    @keyframes walkBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
+    .char-figure {
+      animation: walkBounce 2.5s ease-in-out infinite;
+    }
+
+    /* 手繪山岳筆觸 */
     .crayon-style {
       stroke-linecap: round;
       stroke-linejoin: round;
@@ -60,7 +69,7 @@
             經濟百岳修煉圖
             <span class="text-xs font-bold px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full">宜蘭礁溪天氣實況</span>
           </h1>
-          <p class="text-xs text-slate-400 hidden sm:block">佛光大學應用經濟學系・手繪繪本風格考照大隊</p>
+          <p class="text-xs text-slate-400 hidden sm:block">佛光大學應用經濟學系・公仔人物手繪風登山大隊</p>
         </div>
       </div>
 
@@ -79,9 +88,7 @@
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col gap-6">
 
     <!-- 年級狀態切換卡片列 -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3" id="grade-summary-cards">
-      <!-- JS 動態渲染年級卡片 -->
-    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3" id="grade-summary-cards"></div>
 
     <!-- 控制列：統計摘要與姓名學號搜尋 -->
     <div class="bg-white rounded-2xl p-4 border border-amber-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -106,7 +113,7 @@
         <div class="flex items-center justify-between mb-3">
           <h2 class="font-black text-sm text-slate-800 flex items-center space-x-1.5">
             <span class="text-base">🥾</span>
-            <span>手繪百岳登山動態（背景隨礁溪日照天色與天氣變換）</span>
+            <span>公仔登山客・玉山即時動態（背景隨礁溪日照天色與天氣變換）</span>
           </h2>
           <div class="flex items-center space-x-2 text-[10px] text-slate-400">
             <span class="inline-block w-2.5 h-2.5 rounded-full bg-purple-500"></span> 111級
@@ -130,26 +137,26 @@
             </div>
           </div>
 
-          <!-- 手繪水彩山岳 SVG (參照用戶手繪山岳風格) -->
+          <!-- 手繪水彩山岳 SVG -->
           <svg class="w-full h-full crayon-style" viewBox="0 0 800 540" preserveAspectRatio="none">
             <!-- 遠景淡霧山巒 -->
             <path d="M 50,540 Q 200,320 350,330 T 650,280 T 800,400 L 800,540 Z" fill="#9dbfb1" opacity="0.4"/>
             <path d="M 0,540 Q 180,260 400,240 T 780,290 L 800,540 Z" fill="#7fa99b" opacity="0.5"/>
 
-            <!-- 主峰山體（手繪圓潤山形，如圖片風格） -->
+            <!-- 主峰山體（手繪圓潤山形） -->
             <path d="M 120,540 C 220,380 290,160 380,80 C 410,50 430,50 460,80 C 540,170 620,380 720,540 Z" fill="#4d7c66"/>
             
-            <!-- 山腰植被與層次水彩點綴 (白斑點與淺綠厚層) -->
+            <!-- 山腰植被與層次水彩點綴 -->
             <path d="M 210,480 C 270,390 320,260 380,180 C 410,140 430,140 460,180 C 510,250 560,390 630,480 Z" fill="#3b6552" opacity="0.85"/>
             
-            <!-- 手繪白雪山帽 (如日系插畫波浪感雪頂) -->
+            <!-- 手繪白雪山帽 -->
             <path d="M 370,105 C 385,80 400,65 420,65 C 440,65 455,80 470,105 C 460,120 445,115 435,130 C 425,120 410,125 400,135 C 390,120 380,125 370,105 Z" fill="#ffffff" opacity="0.95"/>
 
-            <!-- 山前圓潤矮丘 (青草綠與黃褐大地色) -->
+            <!-- 山前圓潤矮丘 -->
             <path d="M 40,540 C 80,450 160,420 220,450 C 280,480 320,540 340,540 Z" fill="#88b04b" opacity="0.9"/>
             <path d="M 580,540 C 620,440 700,430 760,470 L 800,540 Z" fill="#c9a859" opacity="0.9"/>
 
-            <!-- 手繪蜿蜒盤山山徑 (米黃柔和路徑) -->
+            <!-- 手繪蜿蜒盤山山徑 -->
             <path id="real-mountain-path" d="M 240,510 Q 340,460 480,430 T 290,320 T 490,210 T 415,80" fill="none" stroke="#f6ecc9" stroke-width="8" stroke-dasharray="10,6" stroke-linecap="round"/>
 
             <!-- 營地標註線與地標 -->
@@ -166,36 +173,65 @@
             <text x="95" y="425" font-size="11" font-weight="bold" fill="#047857">🛖 孟祿亭 (1,800m)</text>
           </svg>
 
-          <!-- 學生人物標籤圖層 -->
+          <!-- 學生公仔圖層 (無外框圓圈，純公仔立體小人) -->
           <div id="team-pins-layer" class="absolute inset-0 pointer-events-none"></div>
 
-          <!-- 系主任隨機巡山 NPC 圖層 -->
-          <div id="director-npc" class="absolute pointer-events-auto transition-all duration-1000 ease-in-out cursor-pointer z-30" style="left: 420px; top: 220px; transform: translate(-50%, -100%);">
-            <!-- 系主任打氣氣泡 -->
-            <div class="speech-bubble relative -top-3 bg-amber-400 text-slate-900 text-[11px] font-black px-3 py-1.5 rounded-2xl shadow-lg border-2 border-white whitespace-nowrap">
+          <!-- 系主任慢速巡山 NPC (過渡拉長為 4 秒，間隔 14 秒) -->
+          <div id="director-npc" class="absolute pointer-events-auto cursor-pointer z-30" style="left: 420px; top: 230px; transform: translate(-50%, -100%); transition: left 4s ease-in-out, top 4s ease-in-out;">
+            <!-- 主任打氣氣泡 -->
+            <div class="speech-bubble relative -top-2 bg-amber-400 text-slate-900 text-[11px] font-black px-3 py-1.5 rounded-2xl shadow-lg border-2 border-white whitespace-nowrap">
               <span id="director-quote">今天礁溪天氣不錯，大家多考一張！</span>
               <div class="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-amber-400 rotate-45 border-r-2 border-b-2 border-white"></div>
             </div>
-            <!-- 系主任手繪人物小人 -->
-            <div class="flex flex-col items-center">
-              <div class="w-10 h-10 rounded-full bg-amber-100 border-2 border-amber-600 flex items-center justify-center text-xl shadow-lg relative">
-                👨‍🏫
-                <span class="absolute -bottom-1 bg-amber-700 text-white text-[9px] px-1 rounded font-bold">主任</span>
-              </div>
+            
+            <!-- 主任立體公仔小人（澎捲髮 + 黑框眼鏡 + 橘背心，完全符合附圖風格） -->
+            <div class="flex flex-col items-center select-none">
+              <svg width="42" height="60" viewBox="0 0 50 72" class="drop-shadow-lg">
+                <!-- 捲捲黑頭髮 -->
+                <path d="M 14,22 C 10,18 10,10 16,8 C 18,3 27,2 32,5 C 38,2 45,6 44,13 C 48,16 48,24 41,26 C 36,28 17,27 14,22 Z" fill="#1e1e24"/>
+                <!-- 圓頭部 (木偶膚色) -->
+                <circle cx="28" cy="22" r="14" fill="#fbd5b5"/>
+                <!-- 腮紅 -->
+                <ellipse cx="19" cy="25" rx="2.5" ry="1.5" fill="#f87171" opacity="0.7"/>
+                <ellipse cx="37" cy="25" rx="2.5" ry="1.5" fill="#f87171" opacity="0.7"/>
+                <!-- 黑框眼鏡與雙眼 -->
+                <circle cx="21" cy="20" r="4.5" fill="none" stroke="#1e1e24" stroke-width="2"/>
+                <circle cx="35" cy="20" r="4.5" fill="none" stroke="#1e1e24" stroke-width="2"/>
+                <line x1="25.5" y1="20" x2="30.5" y2="20" stroke="#1e1e24" stroke-width="2"/>
+                <circle cx="21" cy="20" r="1.5" fill="#1e1e24"/>
+                <circle cx="35" cy="20" r="1.5" fill="#1e1e24"/>
+                <!-- 親切微笑 -->
+                <path d="M 25,27 Q 28,30 31,27" fill="none" stroke="#8c4a2f" stroke-width="1.8" stroke-linecap="round"/>
+                
+                <!-- 身體：白襯衫底 + 橘色領巾/背心 (附圖風格) -->
+                <rect x="20" y="34" width="16" height="18" rx="4" fill="#f97316"/>
+                <rect x="25" y="34" width="6" height="18" fill="#ffffff"/>
+                <!-- 胸前小徽章 -->
+                <circle cx="32" cy="39" r="2" fill="#06b6d4"/>
+                <!-- 手臂 -->
+                <rect x="14" y="35" width="5" height="14" rx="2.5" fill="#ffffff"/>
+                <rect x="37" y="35" width="5" height="14" rx="2.5" fill="#ffffff"/>
+                <!-- 雙腿 (黑長褲 + 白鞋) -->
+                <rect x="21" y="52" width="6" height="14" rx="2" fill="#1e293b"/>
+                <rect x="29" y="52" width="6" height="14" rx="2" fill="#1e293b"/>
+                <rect x="20" y="66" width="7" height="4" rx="1.5" fill="#ffffff"/>
+                <rect x="29" y="66" width="7" height="4" rx="1.5" fill="#ffffff"/>
+              </svg>
+              <span class="mt-0.5 bg-amber-700 text-white text-[9px] px-1.5 py-0.2 rounded-full font-bold shadow-xs">系主任</span>
             </div>
           </div>
 
         </div>
       </div>
 
-      <!-- 右側：學生考照狀態榜與進度條 -->
+      <!-- 右側：學生考照成就排行榜 -->
       <div class="lg:col-span-4 bg-white rounded-3xl p-5 border border-amber-100 shadow-sm flex flex-col gap-3">
         <div class="flex items-center justify-between border-b border-amber-50 pb-2">
           <h2 class="font-black text-sm text-slate-800 flex items-center space-x-1.5">
             <span class="text-base">🏆</span>
             <span>學生考照成就排行榜</span>
           </h2>
-          <span class="text-[10px] text-slate-400">點擊查看個人手冊</span>
+          <span class="text-[10px] text-slate-400">點擊查看個人履歷</span>
         </div>
 
         <div id="team-roster-list" class="custom-scroll max-h-[480px] overflow-y-auto space-y-2 pr-1"></div>
@@ -430,7 +466,7 @@
       { id: "112175310", name: "葉昱完", grade: "112級", certs: [{ name: "TBSA商務企劃初階", date: "2025/05/29" }] },
       { id: "112175311", name: "詹云鳶", grade: "112級", certs: [] },
       { id: "112175312", name: "黃梧傑", grade: "112級", certs: [
-        { name: "金融市場常識與職業道德", date: "2024/08/01" }, { name: "人身保險業務員", date: "2024/08/01" },
+        { name: "金融市場常識與職業道德", date: "2024/08/01" }, { name: "人生保險業務員", date: "2024/08/01" },
         { name: "投資型保險商品業務員", date: "2025/04/20" }, { name: "TBSA商務企劃初階", date: "2025/05/29" }
       ]},
       { id: "112175313", name: "楊礎安", grade: "112級", certs: [] },
@@ -536,14 +572,13 @@
     let selectedGrade = 'ALL';
 
     const GRADE_COLORS = {
-      '111級': { badge: 'bg-purple-600', border: 'border-purple-400', text: 'text-purple-600', bg: 'bg-purple-50' },
-      '112級': { badge: 'bg-blue-600', border: 'border-blue-400', text: 'text-blue-600', bg: 'bg-blue-50' },
-      '113級': { badge: 'bg-emerald-600', border: 'border-emerald-400', text: 'text-emerald-600', bg: 'bg-emerald-50' },
-      '114級': { badge: 'bg-amber-600', border: 'border-amber-400', text: 'text-amber-600', bg: 'bg-amber-50' },
-      '115級': { badge: 'bg-pink-600', border: 'border-pink-400', text: 'text-pink-600', bg: 'bg-pink-50' }
+      '111級': { badge: 'bg-purple-600', shirt: '#a855f7', text: 'text-purple-600', bg: 'bg-purple-50' },
+      '112級': { badge: 'bg-blue-600', shirt: '#3b82f6', text: 'text-blue-600', bg: 'bg-blue-50' },
+      '113級': { badge: 'bg-emerald-600', shirt: '#10b981', text: 'text-emerald-600', bg: 'bg-emerald-50' },
+      '114級': { badge: 'bg-amber-600', shirt: '#f59e0b', text: 'text-amber-600', bg: 'bg-amber-50' },
+      '115級': { badge: 'bg-pink-600', shirt: '#ec4899', text: 'text-pink-600', bg: 'bg-pink-50' }
     };
 
-    // 系主任打氣語錄庫
     const DIRECTOR_QUOTES = [
       "今天礁溪天氣不錯，大家多考一張！",
       "爬上白木林，銀行面試不用愁！",
@@ -555,23 +590,19 @@
       "山頂的風景最美，大家衝刺呀！"
     ];
 
-    // ================= 1. 宜蘭礁溪即時天氣串接與日出日落連動 =================
+    // ================= 1. 宜蘭礁溪即時天氣串接 =================
     async function fetchJiaoxiWeather() {
       try {
-        // 宜蘭礁溪經緯度: 24.82, 121.77
         const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=24.82&longitude=121.77&current_weather=true&daily=sunrise,sunset&timezone=Asia%2FTaipei');
         const data = await res.json();
-        
         if (data && data.current_weather) {
           const temp = Math.round(data.current_weather.temperature);
           const weatherCode = data.current_weather.weathercode;
           const isDay = data.current_weather.is_day;
-          
           updateWeatherUI(temp, weatherCode, isDay);
           updateSkyBackground(isDay, weatherCode);
         }
       } catch (err) {
-        console.warn('天氣 API 連線失敗，改用預設晴天');
         applyDefaultDaySky();
       }
     }
@@ -580,7 +611,6 @@
       document.getElementById('weather-temp').innerText = `宜蘭礁溪 ${temp}°C`;
       const descEl = document.getElementById('weather-desc');
       const iconEl = document.getElementById('weather-icon');
-      
       let desc = '天氣晴朗';
       let icon = isDay ? '☀️' : '🌙';
 
@@ -599,7 +629,6 @@
       } else {
         showRainEffect(false);
       }
-
       descEl.innerText = desc;
       iconEl.innerText = icon;
     }
@@ -622,27 +651,22 @@
       }
     }
 
-    // 依白天/夜間/黃昏動態調整山岳天色
     function updateSkyBackground(isDay, code) {
       const container = document.getElementById('sky-canvas-container');
       const celestial = document.getElementById('celestial-graphic');
       const hour = new Date().getHours();
 
       if (!isDay || hour < 5 || hour >= 18) {
-        // 夜間星空深藍色
         container.style.background = 'linear-gradient(to bottom, #1e293b 0%, #334155 45%, #475569 100%)';
         celestial.innerText = '🌙';
         celestial.className = 'w-12 h-12 rounded-full bg-amber-100 shadow-[0_0_20px_rgba(254,243,199,0.7)] flex items-center justify-center text-xl';
       } else if (hour >= 16 && hour < 18) {
-        // 黃昏暮色 (金橘淡紫)
         container.style.background = 'linear-gradient(to bottom, #fdba74 0%, #fed7aa 40%, #e0e7ff 100%)';
         celestial.innerText = '🌇';
       } else if (code >= 51) {
-        // 雨天灰藍色
         container.style.background = 'linear-gradient(to bottom, #94a3b8 0%, #cbd5e1 50%, #e2e8f0 100%)';
         celestial.innerText = '🌧️';
       } else {
-        // 晴朗明亮天空
         applyDefaultDaySky();
       }
     }
@@ -652,31 +676,29 @@
       container.style.background = 'linear-gradient(to bottom, #7dd3fc 0%, #bae6fd 45%, #ecfccb 100%)';
     }
 
-    // ================= 2. 系主任巡山 NPC 隨機走動與講話 =================
+    // ================= 2. 系主任巡山 NPC (調慢至 14 秒移動一次) =================
     function startDirectorPatrol() {
       const director = document.getElementById('director-npc');
       const quoteEl = document.getElementById('director-quote');
 
-      // 預設在山道上巡邏的節點座標 (left px, top px)
       const waypoints = [
-        { x: 260, y: 500 }, // 登山口附近
-        { x: 380, y: 440 }, // 孟祿亭
-        { x: 310, y: 330 }, // 白木林觀景台
-        { x: 480, y: 220 }, // 排雲山莊
-        { x: 420, y: 95 }   // 主峰頂下
+        { x: 250, y: 505 },
+        { x: 370, y: 445 },
+        { x: 300, y: 325 },
+        { x: 480, y: 220 },
+        { x: 420, y: 95 }
       ];
 
+      // 每 14 秒才悠閒換點一次
       setInterval(() => {
-        // 隨機選一個巡山位置
         const target = waypoints[Math.floor(Math.random() * waypoints.length)];
-        const jitterX = (Math.random() * 40) - 20;
+        const jitterX = (Math.random() * 30) - 15;
         director.style.left = `${target.x + jitterX}px`;
         director.style.top = `${target.y}px`;
 
-        // 隨機換一句加油金句
         const randomQuote = DIRECTOR_QUOTES[Math.floor(Math.random() * DIRECTOR_QUOTES.length)];
         quoteEl.innerText = randomQuote;
-      }, 5500);
+      }, 14000);
 
       director.onclick = () => {
         const randomQuote = DIRECTOR_QUOTES[Math.floor(Math.random() * DIRECTOR_QUOTES.length)];
@@ -684,7 +706,67 @@
       };
     }
 
-    // ================= 3. 年級統計卡與名冊渲染 =================
+    // ================= 3. 純立體手繪公仔人物 SVG 生成函式 (無外框圓形) =================
+    function createFigureSVG(genderType, shirtColor) {
+      if (genderType === 'female') {
+        // 齊肩黑髮、粉嫩腮紅、雙腿公仔 (附圖左側女學生風格)
+        return `
+          <svg width="28" height="46" viewBox="0 0 36 58" class="char-figure drop-shadow-md">
+            <!-- 齊肩黑髮 -->
+            <path d="M 10,16 C 6,10 8,3 18,3 C 28,3 30,10 26,16 C 29,20 28,30 25,32 C 22,25 24,18 24,18 C 22,19 14,19 12,18 C 12,18 14,25 11,32 C 8,30 7,20 10,16 Z" fill="#18181b"/>
+            <!-- 圓臉 -->
+            <circle cx="18" cy="17" r="10" fill="#fed7aa"/>
+            <!-- 腮紅 -->
+            <ellipse cx="12" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
+            <ellipse cx="24" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
+            <!-- 笑眼與微翹嘴巴 -->
+            <path d="M 13,15 Q 15,13 17,15" fill="none" stroke="#27272a" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M 19,15 Q 21,13 23,15" fill="none" stroke="#27272a" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M 16,21 Q 18,23 20,21" fill="none" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- 上衣 (依年級專屬色彩) -->
+            <rect x="12" y="27" width="12" height="15" rx="3.5" fill="${shirtColor}"/>
+            <!-- 手臂 -->
+            <rect x="8" y="28" width="3.5" height="11" rx="1.7" fill="#fed7aa"/>
+            <rect x="24.5" y="28" width="3.5" height="11" rx="1.7" fill="#fed7aa"/>
+            <!-- 雙腿 (淺灰長褲 + 小鞋) -->
+            <rect x="13" y="42" width="4" height="11" rx="1" fill="#e2e8f0"/>
+            <rect x="19" y="42" width="4" height="11" rx="1" fill="#e2e8f0"/>
+            <rect x="12" y="53" width="5" height="3" rx="1" fill="#1e293b"/>
+            <rect x="19" y="53" width="5" height="3" rx="1" fill="#1e293b"/>
+          </svg>
+        `;
+      } else {
+        // 微捲黑髮、黑框眼鏡、年級上衣與黑長褲 (附圖右側風格)
+        return `
+          <svg width="28" height="48" viewBox="0 0 36 60" class="char-figure drop-shadow-md">
+            <!-- 捲黑髮 -->
+            <path d="M 10,14 C 7,11 8,5 13,4 C 15,1 21,1 24,3 C 28,1 33,5 31,10 C 34,12 34,17 29,19 C 25,20 12,20 10,14 Z" fill="#18181b"/>
+            <!-- 圓臉 -->
+            <circle cx="20" cy="16" r="10.5" fill="#fbd5b5"/>
+            <!-- 腮紅 -->
+            <ellipse cx="13" cy="18" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
+            <ellipse cx="27" cy="18" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
+            <!-- 眼睛 -->
+            <circle cx="15" cy="15" r="1.5" fill="#18181b"/>
+            <circle cx="25" cy="15" r="1.5" fill="#18181b"/>
+            <!-- 笑嘴 -->
+            <path d="M 18,20 Q 20,22 22,20" fill="none" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- 身體上衣 -->
+            <rect x="13" y="27" width="14" height="16" rx="3.5" fill="${shirtColor}"/>
+            <!-- 手臂 -->
+            <rect x="9" y="28" width="4" height="12" rx="2" fill="#ffffff"/>
+            <rect x="27" y="28" width="4" height="12" rx="2" fill="#ffffff"/>
+            <!-- 長褲與白鞋 -->
+            <rect x="14" y="43" width="4.5" height="12" rx="1" fill="#1e293b"/>
+            <rect x="21.5" y="43" width="4.5" height="12" rx="1" fill="#1e293b"/>
+            <rect x="13.5" y="55" width="5" height="3" rx="1" fill="#ffffff"/>
+            <rect x="21.5" y="55" width="5" height="3" rx="1" fill="#ffffff"/>
+          </svg>
+        `;
+      }
+    }
+
+    // ================= 4. 年級統計卡與大隊名冊渲染 =================
     function renderGradeSummaryCards() {
       const container = document.getElementById('grade-summary-cards');
       container.innerHTML = '';
@@ -754,7 +836,7 @@
       renderTeamRoster(list);
     }
 
-    // 渲染山岳學生人物標記
+    // 渲染公仔小人標籤 (無圓圈純人物圖案)
     function renderTeamPins(list) {
       const layer = document.getElementById('team-pins-layer');
       layer.innerHTML = '';
@@ -764,37 +846,35 @@
         const altitude = calculateStudentAltitude(st.certs);
         const ratio = altitude / 3952;
         
-        // 依據手繪山岳路徑定位
         const jitter = ((st.name.charCodeAt(0) * 19) % 70) - 35;
         const topY = 510 - ratio * (510 - 95);
         const baseX = 415 + Math.sin(ratio * Math.PI * 2.3) * 150;
         const leftX = Math.max(70, Math.min(730, baseX + jitter));
 
-        const conf = GRADE_COLORS[st.grade] || { badge: 'bg-slate-700', border: 'border-slate-400' };
+        const conf = GRADE_COLORS[st.grade] || { badge: 'bg-slate-700', shirt: '#64748b' };
+        // 依學號或姓名自動分派男女公仔造型
+        const isFemale = (st.name.charCodeAt(st.name.length - 1) % 2 === 0);
+        const figureHtml = createFigureSVG(isFemale ? 'female' : 'male', conf.shirt);
 
         const pin = document.createElement('div');
-        pin.className = 'absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-full hover:scale-125 transition-transform duration-200 z-10';
+        pin.className = 'absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-full hover:scale-130 transition-transform duration-200 z-10 select-none';
         pin.style.left = `${leftX}px`;
         pin.style.top = `${topY}px`;
         pin.onclick = () => openStudentModal(st);
 
-        // 人物登山客小人圖案
+        // 純公仔人物小人 + 頭頂簡潔名牌
         pin.innerHTML = `
           <div class="flex flex-col items-center">
-            <div class="px-1.5 py-0.5 rounded-full text-[9px] font-bold text-white shadow-md whitespace-nowrap ${conf.badge}">
-              ${st.name} (${certCount})
+            <div class="px-1.5 py-0.2 rounded-full text-[9px] font-black text-white shadow-xs whitespace-nowrap mb-0.5 ${conf.badge}">
+              ${st.name} ${certCount > 0 ? `(${certCount})` : ''}
             </div>
-            <!-- 人物登山客圖案 -->
-            <div class="w-7 h-7 rounded-full bg-amber-50 border-2 ${conf.border} flex items-center justify-center text-sm shadow-md">
-              🧗
-            </div>
+            ${figureHtml}
           </div>
         `;
         layer.appendChild(pin);
       });
     }
 
-    // 渲染排行榜與狀態進度條
     function renderTeamRoster(list) {
       const container = document.getElementById('team-roster-list');
       container.innerHTML = '';
@@ -815,7 +895,7 @@
         const certCount = st.certs ? st.certs.length : 0;
         const alt = calculateStudentAltitude(st.certs);
         const pct = Math.min(100, Math.round((alt / 3952) * 100));
-        const conf = GRADE_COLORS[st.grade] || { bg: 'bg-slate-100', text: 'text-slate-600', badge: 'bg-slate-600' };
+        const conf = GRADE_COLORS[st.grade] || { bg: 'bg-slate-100', text: 'text-slate-600' };
 
         const card = document.createElement('div');
         card.className = 'p-3 bg-amber-50/30 border border-amber-100 rounded-2xl hover:bg-amber-100/40 hover:border-amber-300 transition cursor-pointer flex flex-col gap-2';
@@ -842,7 +922,6 @@
               <p class="text-[10px] text-amber-600 font-bold mt-0.5">${alt.toLocaleString()} m</p>
             </div>
           </div>
-          <!-- 攀登進度條 -->
           <div class="w-full bg-slate-200/80 h-1.5 rounded-full overflow-hidden">
             <div class="bg-gradient-to-r from-amber-400 to-emerald-500 h-full rounded-full" style="width: ${pct}%"></div>
           </div>
@@ -851,7 +930,7 @@
       });
     }
 
-    // 彈窗
+    // Modal
     function openStudentModal(student) {
       const modal = document.getElementById('student-modal');
       const certCount = student.certs ? student.certs.length : 0;
