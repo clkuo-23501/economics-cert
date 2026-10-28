@@ -4,33 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>經濟系考照百岳修煉圖</title>
-  <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
-    body {
-      font-family: 'Noto Sans TC', sans-serif;
-    }
-    .custom-scroll::-webkit-scrollbar {
-      width: 6px;
-    }
-    .custom-scroll::-webkit-scrollbar-track {
-      background: #f1f5f9;
-    }
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 4px;
-    }
-    .custom-scroll::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
-    }
-    .tab-active {
-      border-color: #2563eb;
-      color: #2563eb;
-      background-color: #eff6ff;
-    }
+    body { font-family: 'Noto Sans TC', sans-serif; }
+    .custom-scroll::-webkit-scrollbar { width: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
@@ -50,15 +33,14 @@
         </div>
       </div>
 
-      <!-- 頁籤切換按鈕 -->
       <nav class="flex space-x-2 bg-slate-100 p-1 rounded-xl">
-        <button id="tab-btn-personal" onclick="switchMainTab('personal')" class="px-4 py-1.5 rounded-lg text-sm font-bold transition flex items-center space-x-1.5 bg-white text-blue-600 shadow-sm">
-          <i data-lucide="user" class="w-4 h-4"></i>
-          <span>個人修煉圖</span>
-        </button>
-        <button id="tab-btn-team" onclick="switchMainTab('team')" class="px-4 py-1.5 rounded-lg text-sm font-bold transition flex items-center space-x-1.5 text-slate-600 hover:text-slate-900">
+        <button id="tab-btn-team" onclick="switchMainTab('team')" class="px-4 py-1.5 rounded-lg text-sm font-bold transition flex items-center space-x-1.5 bg-white text-blue-600 shadow-sm">
           <i data-lucide="users" class="w-4 h-4"></i>
           <span>全系登山大隊榜</span>
+        </button>
+        <button id="tab-btn-personal" onclick="switchMainTab('personal')" class="px-4 py-1.5 rounded-lg text-sm font-bold transition flex items-center space-x-1.5 text-slate-600 hover:text-slate-900">
+          <i data-lucide="user" class="w-4 h-4"></i>
+          <span>個人修煉圖</span>
         </button>
       </nav>
     </div>
@@ -67,9 +49,92 @@
   <!-- 主內容區 -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col gap-6">
 
-    <!-- ================= 頁面一：個人修煉圖 ================= -->
-    <section id="view-personal" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- ================= 頁籤一：全系登山大隊榜（預設顯示） ================= -->
+    <section id="view-team" class="flex flex-col gap-6">
       
+      <!-- 控制列 -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+        <!-- 年級篩選按鈕 -->
+        <div class="flex flex-wrap items-center gap-1.5 w-full md:w-auto">
+          <span class="text-xs font-bold text-slate-400 mr-1">年級篩選:</span>
+          <button onclick="filterGrade('ALL')" class="grade-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white" data-grade="ALL">全部年級</button>
+          <button onclick="filterGrade('111級')" class="grade-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200" data-grade="111級">111級</button>
+          <button onclick="filterGrade('112級')" class="grade-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200" data-grade="112級">112級</button>
+          <button onclick="filterGrade('113級')" class="grade-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200" data-grade="113級">113級</button>
+          <button onclick="filterGrade('114級')" class="grade-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200" data-grade="114級">114級</button>
+          <button onclick="filterGrade('115級')" class="grade-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200" data-grade="115級">115級</button>
+        </div>
+
+        <div class="flex items-center space-x-2 w-full md:w-auto justify-end">
+          <div class="relative flex-1 md:w-56">
+            <input type="text" id="team-search-input" oninput="renderTeamView()" placeholder="搜尋姓名或學號..." class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:bg-white focus:ring-2 focus:ring-blue-500">
+            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
+          </div>
+          <button onclick="openImportModal()" class="px-3 py-1.5 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-700 transition flex items-center space-x-1 whitespace-nowrap shadow-sm">
+            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+            <span>匯入名冊</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 下方雙欄：左側大山全員標籤、右側大隊排名 -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- 左側：巨型百岳全景分佈圖 -->
+        <div class="lg:col-span-8 bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="font-bold text-sm text-slate-800 flex items-center space-x-1.5">
+              <i data-lucide="map-pin" class="w-4 h-4 text-rose-500"></i>
+              <span>玉山主峰・全員攀登即時分佈</span>
+            </h2>
+            <span class="text-xs text-slate-400">點選山上的標籤可查看該生履歷手冊</span>
+          </div>
+
+          <div class="relative w-full h-[540px] bg-gradient-to-b from-sky-400 via-sky-100 to-emerald-100 rounded-xl overflow-hidden border border-slate-200 shadow-inner">
+            <svg class="w-full h-full" viewBox="0 0 800 540" preserveAspectRatio="none">
+              <polygon points="400,40 80,540 720,540" fill="#94a3b8" opacity="0.4"/>
+              <polygon points="400,40 200,540 600,540" fill="#64748b" opacity="0.6"/>
+              <polygon points="400,40 280,540 520,540" fill="#475569"/>
+              <polygon points="400,40 365,100 435,100" fill="#ffffff"/>
+              <!-- S 型登山路徑 -->
+              <path d="M 220,500 Q 360,450 520,410 T 280,290 T 520,180 T 400,60" fill="none" stroke="#facc15" stroke-width="6" stroke-dasharray="8,6" stroke-linecap="round"/>
+              
+              <!-- 各營地高度線 -->
+              <line x1="80" y1="60" x2="720" y2="60" stroke="#f43f5e" stroke-dasharray="4,4" stroke-width="1"/>
+              <text x="100" y="55" font-size="12" font-weight="bold" fill="#e11d48">玉山主峰頂 (3,952m)</text>
+
+              <line x1="80" y1="180" x2="720" y2="180" stroke="#ea580c" stroke-dasharray="4,4" stroke-width="1"/>
+              <text x="100" y="175" font-size="11" fill="#c2410c">排雲山莊 (3,402m)</text>
+
+              <line x1="80" y1="290" x2="720" y2="290" stroke="#2563eb" stroke-dasharray="4,4" stroke-width="1"/>
+              <text x="100" y="285" font-size="11" fill="#1d4ed8">白木林觀景台 (2,700m)</text>
+
+              <line x1="80" y1="410" x2="720" y2="410" stroke="#059669" stroke-dasharray="4,4" stroke-width="1"/>
+              <text x="100" y="405" font-size="11" fill="#047857">孟祿亭 (1,800m)</text>
+            </svg>
+
+            <!-- 學生浮動標記層 -->
+            <div id="team-pins-layer" class="absolute inset-0 pointer-events-none"></div>
+          </div>
+        </div>
+
+        <!-- 右側：大隊排行與名冊 -->
+        <div class="lg:col-span-4 bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col gap-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h2 class="font-bold text-sm text-slate-800 flex items-center space-x-1.5">
+              <i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i>
+              <span>考照大隊排行榜</span>
+            </h2>
+            <span id="roster-count-txt" class="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-600 font-bold">0 人</span>
+          </div>
+
+          <div id="team-roster-list" class="custom-scroll max-h-[470px] overflow-y-auto space-y-2 pr-1"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 頁籤二：個人修煉圖 ================= -->
+    <section id="view-personal" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
       <!-- 左側：登山視覺化看板 -->
       <div class="lg:col-span-5 flex flex-col gap-4">
         <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col gap-4">
@@ -90,15 +155,11 @@
           <!-- 登山 SVG 動態圖 -->
           <div class="relative w-full h-[360px] bg-gradient-to-b from-sky-400 via-sky-200 to-emerald-100 rounded-xl overflow-hidden border border-slate-200 shadow-inner">
             <svg class="w-full h-full" viewBox="0 0 300 400" preserveAspectRatio="none">
-              <!-- 山體背景 -->
               <polygon points="150,30 20,400 280,400" fill="#cbd5e1" opacity="0.6"/>
               <polygon points="150,30 60,400 240,400" fill="#94a3b8" opacity="0.8"/>
               <polygon points="150,30 110,400 190,400" fill="#64748b"/>
-              <!-- 積雪峰頂 -->
               <polygon points="150,30 135,80 165,80" fill="#ffffff"/>
-              <!-- 盤山路線 -->
-              <path id="mountain-path" d="M 60,380 Q 130,340 180,310 T 110,220 T 190,140 T 150,45" fill="none" stroke="#fde047" stroke-width="4" stroke-dasharray="6,4" stroke-linecap="round"/>
-              <!-- 高度指標 -->
+              <path d="M 60,380 Q 130,340 180,310 T 110,220 T 190,140 T 150,45" fill="none" stroke="#fde047" stroke-width="4" stroke-dasharray="6,4" stroke-linecap="round"/>
               <circle cx="150" cy="45" r="5" fill="#ef4444"/>
               <text x="160" y="50" font-size="10" font-weight="bold" fill="#dc2626">玉山主峰 3952m</text>
               <circle cx="190" cy="140" r="4" fill="#f97316"/>
@@ -106,22 +167,20 @@
               <circle cx="110" cy="220" r="4" fill="#3b82f6"/>
               <text x="35" y="225" font-size="9" fill="#1d4ed8">白木林觀景台 2700m</text>
               <circle cx="180" cy="310" r="4" fill="#10b981"/>
-              <text x="190" y="315" font-size="9" fill="#047857">孟祿亭 2838m</text>
+              <text x="190" y="315" font-size="9" fill="#047857">孟祿亭 1800m</text>
             </svg>
 
-            <!-- 橘 DP 登山小人 (定位於路徑上) -->
+            <!-- 橘 DP 登山小人 -->
             <div id="orange-cat-avatar" class="absolute transition-all duration-700 ease-out flex flex-col items-center" style="left: 55px; top: 355px; transform: translate(-50%, -50%);">
               <div class="px-2 py-0.5 bg-amber-500 text-white font-bold text-[10px] rounded-full shadow-md whitespace-nowrap mb-1">
                 橘DP登山中
               </div>
-              <!-- 橘貓圖標 -->
               <div class="w-10 h-10 rounded-full bg-orange-400 border-2 border-white shadow-lg flex items-center justify-center text-lg">
                 🐱
               </div>
             </div>
           </div>
 
-          <!-- 當前營地與鼓勵語 -->
           <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-900 flex items-start space-x-2">
             <span class="text-base">🏕️</span>
             <div>
@@ -131,29 +190,25 @@
           </div>
         </div>
 
-        <!-- 解鎖登山裝備欄 -->
+        <!-- 裝備庫 -->
         <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col gap-3">
           <h2 class="font-bold text-sm text-slate-700 flex items-center space-x-1.5">
             <i data-lucide="backpack" class="w-4 h-4 text-amber-500"></i>
             <span>已獲得登山裝備庫</span>
           </h2>
-          <div id="equipment-container" class="grid grid-cols-2 gap-2 text-xs">
-            <!-- 裝備由 JS 動態渲染 -->
-          </div>
+          <div id="equipment-container" class="grid grid-cols-2 gap-2 text-xs"></div>
         </div>
       </div>
 
-      <!-- 右側：證照勾選清單 -->
+      <!-- 右側：個人證照清單 -->
       <div class="lg:col-span-7 flex flex-col gap-4">
         <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col gap-4">
-          
-          <!-- 個人資訊與搜尋 -->
           <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between border-b border-slate-100 pb-4">
             <div class="flex items-center space-x-2 flex-1">
               <input type="text" id="user-name-input" placeholder="請輸入姓名" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm w-32 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none">
               <select id="user-grade-select" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none">
                 <option value="111級">111級</option>
-                <option value="112級">112級</option>
+                <option value="112級" selected>112級</option>
                 <option value="113級">113級</option>
                 <option value="114級">114級</option>
                 <option value="115級">115級</option>
@@ -165,7 +220,6 @@
             </div>
           </div>
 
-          <!-- 分類標籤切換 -->
           <div class="flex flex-wrap gap-1.5" id="category-tabs">
             <button onclick="filterCategory('ALL')" class="cat-btn px-3 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white" data-cat="ALL">全部</button>
             <button onclick="filterCategory('COMMON')" class="cat-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200" data-cat="COMMON">共同/AI/商務</button>
@@ -175,12 +229,8 @@
             <button onclick="filterCategory('LANGUAGE')" class="cat-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200" data-cat="LANGUAGE">外語檢定</button>
           </div>
 
-          <!-- 證照清單 (滾動區) -->
-          <div id="cert-list-container" class="custom-scroll max-h-[520px] overflow-y-auto space-y-2 pr-1">
-            <!-- 證照由 JS 動態渲染 -->
-          </div>
+          <div id="cert-list-container" class="custom-scroll max-h-[520px] overflow-y-auto space-y-2 pr-1"></div>
 
-          <!-- 底部工具按鈕 -->
           <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
             <button onclick="resetPersonalData()" class="text-xs text-rose-500 hover:underline">重設個人勾選</button>
             <button onclick="exportSummitCard()" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold rounded-xl shadow-md hover:shadow-lg transition flex items-center space-x-1.5">
@@ -192,99 +242,9 @@
       </div>
     </section>
 
-    <!-- ================= 頁面二：全系登山大隊榜 ================= -->
-    <section id="view-team" class="hidden flex-col gap-6">
-      
-      <!-- 控制列 -->
-      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
-        <!-- 年級篩選按鈕 -->
-        <div class="flex flex-wrap items-center gap-1.5 w-full md:w-auto">
-          <span class="text-xs font-bold text-slate-400 mr-1">年級篩選:</span>
-          <button onclick="filterGrade('ALL')" class="grade-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white" data-grade="ALL">全部年級</button>
-          <button onclick="filterGrade('111級')" class="grade-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200" data-grade="111級">111級</button>
-          <button onclick="filterGrade('112級')" class="grade-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200" data-grade="112級">112級</button>
-          <button onclick="filterGrade('113級')" class="grade-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200" data-grade="113級">113級</button>
-          <button onclick="filterGrade('114級')" class="grade-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200" data-grade="114級">114級</button>
-          <button onclick="filterGrade('115級')" class="grade-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200" data-grade="115級">115級</button>
-        </div>
-
-        <div class="flex items-center space-x-2 w-full md:w-auto justify-end">
-          <div class="relative flex-1 md:w-48">
-            <input type="text" id="team-search-input" oninput="renderTeamRoster()" placeholder="搜尋姓名或學號..." class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none">
-            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
-          </div>
-          <button onclick="openImportModal()" class="px-3 py-1.5 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-700 transition flex items-center space-x-1 whitespace-nowrap shadow-sm">
-            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-            <span>批次匯入名冊</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- 下方雙欄：左側大山全員標籤、右側大隊排名 -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <!-- 左側：巨型百岳全景分佈圖 -->
-        <div class="lg:col-span-8 bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col">
-          <div class="flex items-center justify-between mb-3">
-            <h2 class="font-bold text-sm text-slate-800 flex items-center space-x-1.5">
-              <i data-lucide="map-pin" class="w-4 h-4 text-rose-500"></i>
-              <span>玉山主峰・全員攀登即時分佈</span>
-            </h2>
-            <span class="text-xs text-slate-400">點選山上的標籤可查看該生履歷手冊</span>
-          </div>
-
-          <div class="relative w-full h-[520px] bg-gradient-to-b from-sky-400 via-sky-100 to-emerald-100 rounded-xl overflow-hidden border border-slate-200 shadow-inner">
-            <svg class="w-full h-full" viewBox="0 0 800 520" preserveAspectRatio="none">
-              <!-- 背景群山 -->
-              <polygon points="400,40 100,520 700,520" fill="#94a3b8" opacity="0.4"/>
-              <polygon points="400,40 220,520 580,520" fill="#64748b" opacity="0.6"/>
-              <polygon points="400,40 300,520 500,520" fill="#475569"/>
-              <!-- 積雪 -->
-              <polygon points="400,40 370,100 430,100" fill="#ffffff"/>
-              <!-- S 型登山路徑 -->
-              <path id="team-mountain-path" d="M 250,490 Q 380,440 520,400 T 300,280 T 500,180 T 400,60" fill="none" stroke="#facc15" stroke-width="6" stroke-dasharray="8,6" stroke-linecap="round"/>
-              
-              <!-- 各營地高度線 -->
-              <line x1="100" y1="60" x2="700" y2="60" stroke="#f43f5e" stroke-dasharray="4,4" stroke-width="1"/>
-              <text x="120" y="55" font-size="12" font-weight="bold" fill="#e11d48">主峰頂 (3952m)</text>
-
-              <line x1="100" y1="180" x2="700" y2="180" stroke="#ea580c" stroke-dasharray="4,4" stroke-width="1"/>
-              <text x="120" y="175" font-size="11" fill="#c2410c">排雲山莊 (3402m)</text>
-
-              <line x1="100" y1="280" x2="700" y2="280" stroke="#2563eb" stroke-dasharray="4,4" stroke-width="1"/>
-              <text x="120" y="275" font-size="11" fill="#1d4ed8">白木林觀景台 (2700m)</text>
-
-              <line x1="100" y1="400" x2="700" y2="400" stroke="#059669" stroke-dasharray="4,4" stroke-width="1"/>
-              <text x="120" y="395" font-size="11" fill="#047857">孟祿亭 (2838m)</text>
-            </svg>
-
-            <!-- 學生浮動標記層 -->
-            <div id="team-pins-layer" class="absolute inset-0 pointer-events-none">
-              <!-- 由 JS 動態生成每位同學的小人與名字標籤 -->
-            </div>
-          </div>
-        </div>
-
-        <!-- 右側：大隊排行與名冊 -->
-        <div class="lg:col-span-4 bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col gap-4">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-            <h2 class="font-bold text-sm text-slate-800 flex items-center space-x-1.5">
-              <i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i>
-              <span>考照大隊排行榜</span>
-            </h2>
-            <span id="roster-count-txt" class="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-600 font-bold">0 人</span>
-          </div>
-
-          <div id="team-roster-list" class="custom-scroll max-h-[460px] overflow-y-auto space-y-2 pr-1">
-            <!-- 學生卡片清單由 JS 動態生成 -->
-          </div>
-        </div>
-      </div>
-    </section>
-
   </main>
 
-  <!-- ================= 彈窗 1：學生登山手冊 Modal ================= -->
+  <!-- 學生登山手冊 Modal -->
   <div id="student-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
       <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -300,9 +260,7 @@
             <p id="modal-student-id" class="text-xs text-slate-400 mt-0.5">學號：未設定</p>
           </div>
         </div>
-        <button onclick="closeStudentModal()" class="w-8 h-8 rounded-full hover:bg-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-700 transition">
-          ✕
-        </button>
+        <button onclick="closeStudentModal()" class="w-8 h-8 rounded-full hover:bg-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-700 transition">✕</button>
       </div>
 
       <div class="p-5 space-y-4">
@@ -322,94 +280,45 @@
             <i data-lucide="award" class="w-3.5 h-3.5 text-blue-500"></i>
             <span>已通過證照考照紀錄</span>
           </h4>
-          <div id="modal-student-certs" class="custom-scroll max-h-56 overflow-y-auto space-y-1.5 pr-1 text-xs">
-            <!-- 證照條目 -->
-          </div>
+          <div id="modal-student-certs" class="custom-scroll max-h-56 overflow-y-auto space-y-1.5 pr-1 text-xs"></div>
         </div>
       </div>
 
       <div class="p-4 bg-slate-50 border-t border-slate-100 text-right">
-        <button onclick="closeStudentModal()" class="px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-700 transition">
-          關閉手冊
-        </button>
+        <button onclick="closeStudentModal()" class="px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-700 transition">關閉手冊</button>
       </div>
     </div>
   </div>
 
-  <!-- ================= 彈窗 2：批次匯入名冊 Modal ================= -->
+  <!-- 批次匯入名冊 Modal -->
   <div id="import-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
       <div class="p-5 border-b border-slate-100 flex items-center justify-between">
         <h3 class="font-bold text-base text-slate-800 flex items-center space-x-2">
           <i data-lucide="file-json" class="w-5 h-5 text-indigo-600"></i>
-          <span>批次匯入名冊 JSON</span>
+          <span>更新名冊資料 (JSON)</span>
         </h3>
         <button onclick="closeImportModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700">✕</button>
       </div>
       <div class="p-5 space-y-3">
         <p class="text-xs text-slate-500 leading-relaxed">
-          請貼上 Apps Script 產出的 JSON 名冊資料。系統將自動進行模糊名稱比對並即時計算海拔累積。
+          若日後試算表有新增考照紀錄，可貼上 Apps Script 產生的新 JSON 覆蓋更新。
         </p>
-        <textarea id="import-json-textarea" rows="10" placeholder='[ { "id": "112175123", "name": "葉清", "grade": "112級", "certs": [...] } ]' class="w-full p-3 font-mono text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-blue-500"></textarea>
+        <textarea id="import-json-textarea" rows="8" class="w-full p-3 font-mono text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-blue-500"></textarea>
       </div>
       <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-        <button onclick="restoreDefaultData()" class="text-xs text-slate-500 hover:underline">還原預設資料</button>
+        <button onclick="restoreDefaultData()" class="text-xs text-rose-500 hover:underline">還原預設名冊</button>
         <div class="flex space-x-2">
           <button onclick="closeImportModal()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-300">取消</button>
-          <button onclick="confirmImportData()" class="px-5 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 shadow-md">確認匯入並更新地圖</button>
+          <button onclick="confirmImportData()" class="px-5 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 shadow-md">確認更新</button>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- 匯出用的隱藏登頂證書卡片 -->
-  <div id="summit-card-export" class="fixed -left-[9999px] top-0 w-[500px] bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-900 text-white p-8 rounded-3xl shadow-2xl flex flex-col gap-6 border-4 border-amber-400/80">
-    <div class="flex items-center justify-between border-b border-white/20 pb-4">
-      <div class="flex items-center space-x-3">
-        <div class="w-12 h-12 rounded-2xl bg-amber-500 flex items-center justify-center text-2xl font-black shadow-lg">🐱</div>
-        <div>
-          <h2 class="font-black text-xl tracking-tight text-white">佛光大學 應用經濟學系</h2>
-          <p class="text-xs text-amber-300 font-medium tracking-widest">百岳證照攀登・攻頂紀念手冊</p>
-        </div>
-      </div>
-      <div class="text-right">
-        <span class="text-[10px] uppercase tracking-wider text-slate-400">SUMMIT ALTITUDE</span>
-        <p class="text-2xl font-black text-amber-400" id="card-export-alt">0 m</p>
-      </div>
-    </div>
-
-    <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10 space-y-2">
-      <div class="flex justify-between items-baseline">
-        <span class="text-xs text-slate-300">攀登勇士：</span>
-        <span class="text-lg font-black text-white" id="card-export-name">同學姓名</span>
-      </div>
-      <div class="flex justify-between items-baseline">
-        <span class="text-xs text-slate-300">所屬年級：</span>
-        <span class="text-sm font-bold text-amber-300" id="card-export-grade">112級</span>
-      </div>
-      <div class="flex justify-between items-baseline">
-        <span class="text-xs text-slate-300">累計考取張數：</span>
-        <span class="text-base font-bold text-emerald-400" id="card-export-count">0 張</span>
-      </div>
-    </div>
-
-    <div class="space-y-2">
-      <span class="text-xs font-bold text-slate-300">已插旗通過之證照：</span>
-      <div id="card-export-certs" class="grid grid-cols-2 gap-1.5 text-[11px] text-slate-200">
-        <!-- 證照名 -->
-      </div>
-    </div>
-
-    <div class="pt-4 border-t border-white/10 flex justify-between items-center text-[10px] text-slate-400">
-      <span>每一次的準備，都是向上攀升的力量。</span>
-      <span class="text-amber-400 font-bold">FGU DAE 榮譽出品</span>
     </div>
   </div>
 
   <script>
-    // ================= 1. 證照庫定義與點數配分 =================
+    // 證照庫定義
     const CERT_DATABASE = [
-      // 共同 / 新興科技 / 商務
       { id: 'c1', name: '金融市場常識與職業道德', cat: 'COMMON', meters: 200 },
       { id: 'c2', name: 'TBSA商務企劃初階', cat: 'COMMON', meters: 200 },
       { id: 'c3', name: '生成式AI', cat: 'COMMON', meters: 200 },
@@ -417,8 +326,6 @@
       { id: 'c5', name: '永續發展基礎能力測驗', cat: 'COMMON', meters: 250 },
       { id: 'c6', name: '企業化永續管理師合格證書-碳盤查', cat: 'COMMON', meters: 350 },
       { id: 'c7', name: '企業化永續管理師合格證書-永續報告書', cat: 'COMMON', meters: 350 },
-
-      // 銀行業務
       { id: 'b1', name: '信託業務人員', cat: 'BANK', meters: 200 },
       { id: 'b2', name: '銀行內控與內稽', cat: 'BANK', meters: 200 },
       { id: 'b3', name: '票券商業務人員', cat: 'BANK', meters: 250 },
@@ -429,8 +336,6 @@
       { id: 'b8', name: '金融人員風險管理專業能力測驗', cat: 'BANK', meters: 400 },
       { id: 'b9', name: '金融人員授信擔保品估價專業能力測驗', cat: 'BANK', meters: 350 },
       { id: 'b10', name: '債權委外催收測驗', cat: 'BANK', meters: 200 },
-
-      // 證券 / 期貨 / 投信投顧
       { id: 's1', name: '證券商業務人員', cat: 'SECURITIES', meters: 200 },
       { id: 's2', name: '證券商高級業務人員', cat: 'SECURITIES', meters: 350 },
       { id: 's3', name: '期貨商業務員', cat: 'SECURITIES', meters: 250 },
@@ -442,51 +347,60 @@
       { id: 's9', name: '資產證券化', cat: 'SECURITIES', meters: 300 },
       { id: 's10', name: '證券投資分析人員', cat: 'SECURITIES', meters: 800 },
       { id: 's11', name: '期貨交易分析人員', cat: 'SECURITIES', meters: 800 },
-
-      // 保險業務
       { id: 'i1', name: '人身保險業務員', cat: 'INSURANCE', meters: 200 },
       { id: 'i2', name: '財產保險業務員', cat: 'INSURANCE', meters: 200 },
       { id: 'i3', name: '投資型保險商品業務員', cat: 'INSURANCE', meters: 250 },
       { id: 'i4', name: '人身保險業務員銷售外幣收付非投資型保險商品', cat: 'INSURANCE', meters: 250 },
       { id: 'i5', name: '人壽保險核保理賠人員', cat: 'INSURANCE', meters: 400 },
       { id: 'i6', name: '財產保險核保理賠人員', cat: 'INSURANCE', meters: 400 },
-
-      // 語言能力
       { id: 'l1', name: '多益', cat: 'LANGUAGE', meters: 300 },
       { id: 'l2', name: '托福', cat: 'LANGUAGE', meters: 500 },
       { id: 'l3', name: '雅思', cat: 'LANGUAGE', meters: 500 }
     ];
 
-    // ================= 2. 智慧名稱模糊比對與高度計算函式 =================
+    // 模糊比對點數計算
     function getCertPoints(rawName) {
       if (!rawName) return 200;
       const s = String(rawName).trim();
-      
-      // 完全匹配
       const direct = CERT_DATABASE.find(c => c.name === s);
       if (direct) return direct.meters;
 
-      // 關鍵字模糊比對
       if (s.includes('分析人員') || s.includes('分析師')) return 800;
       if (s.includes('托福') || s.includes('雅思')) return 500;
       if (s.includes('核保') || s.includes('風險管理')) return 400;
       if (s.includes('外匯') || s.includes('授信') || s.includes('衍生性') || s.includes('高業') || s.includes('高級') || s.includes('多益') || s.includes('碳盤查') || s.includes('永續報告書')) return 350;
       if (s.includes('期貨') || s.includes('投信') || s.includes('投資型') || s.includes('外幣') || s.includes('理財規劃') || s.includes('永續發展') || s.includes('AI辦公室') || s.includes('票券')) return 250;
-      
-      return 200; // 預設基礎證照點數
+      return 200;
     }
 
     function calculateStudentAltitude(certs) {
       if (!certs || !Array.isArray(certs) || certs.length === 0) return 0;
       let total = 0;
-      certs.forEach(c => {
-        total += getCertPoints(c.name);
-      });
+      certs.forEach(c => { total += getCertPoints(c.name); });
       return Math.min(3952, total);
     }
 
-    // ================= 3. 預設名冊資料 (內建已修正的 100+ 學生名單) =================
-    let ALL_STUDENTS = [
+    // 全系 100+ 位完整學生名單直接內建
+    const DEFAULT_STUDENTS_LIST = [
+      { id: "111175101", name: "羅子涵", grade: "111級", certs: [] },
+      { id: "111175104", name: "王語彤", grade: "111級", certs: [{ name: "金融市場常識與職業道德", date: "2024/02/23" }] },
+      { id: "111175105", name: "蘇芷盈", grade: "111級", certs: [] },
+      { id: "111175106", name: "周凡宜", grade: "111級", certs: [] },
+      { id: "111175107", name: "許嘉云", grade: "111級", certs: [] },
+      { id: "111175110", name: "郭家瑜", grade: "111級", certs: [
+        { name: "金融市場常識與職業道德", date: "2023/08/16" }, { name: "信託業務人員", date: "2025/06/28" },
+        { name: "銀行內控與內稽", date: "2025/09/11" }, { name: "人身保險業務員", date: "2025/03/14" },
+        { name: "衍生性金融商品銷售人員資格測驗", date: "2025/11/11" }
+      ]},
+      { id: "111175111", name: "吳雯琪", grade: "111級", certs: [] },
+      { id: "111175112", name: "林思妤", grade: "111級", certs: [
+        { name: "金融市場常識與職業道德", date: "2023/07/08" }, { name: "人身保險業務員", date: "2023/07/15" },
+        { name: "財產保險業務員", date: "2023/08/01" }, { name: "人身保險業務員銷售外幣收付非投資型保險商品", date: "2025/09/02" }
+      ]},
+      { id: "111175113", name: "樊子源", grade: "111級", certs: [
+        { name: "金融市場常識與職業道德", date: "2024/07/08" }, { name: "信託業務人員", date: "2025/12/14" }
+      ]},
+      { id: "111175102", name: "蘇柏宇", grade: "111級", certs: [] },
       { id: "111175103", name: "呂季生", grade: "111級", certs: [
         { name: "金融市場常識與職業道德", date: "2024/09/27" }, { name: "信託業務人員", date: "2024/08/27" },
         { name: "銀行內控與內稽", date: "2025/05/11" }, { name: "人身保險業務員", date: "2024/12/10" },
@@ -495,11 +409,130 @@
         { name: "衍生性金融商品銷售人員資格測驗", date: "2026/01/06" }, { name: "人身保險業務員銷售外幣收付非投資型保險商品", date: "2025/03/23" },
         { name: "永續發展基礎能力測驗", date: "2025/04/13" }, { name: "投信投顧業務員", date: "2026/02/26" }
       ]},
+      { id: "111175117", name: "饒沛紜", grade: "111級", certs: [] },
+      { id: "111175118", name: "閻勁宇", grade: "111級", certs: [] },
+      { id: "111175119", name: "張泳泰", grade: "111級", certs: [{ name: "TBSA商務企劃初階", date: "2025/05/29" }] },
+      { id: "111175120", name: "周情素", grade: "111級", certs: [] },
+      { id: "111175108", name: "蔡承修", grade: "111級", certs: [] },
+      { id: "111175109", name: "林琬倫", grade: "111級", certs: [
+        { name: "金融市場常識與職業道德", date: "2024/07/15" }, { name: "人身保險業務員", date: "2025/03/08" }
+      ]},
+      { id: "111175124", name: "李杰良", grade: "111級", certs: [] },
+      { id: "111175125", name: "江季軒", grade: "111級", certs: [] },
+      { id: "111175126", name: "黃柏源", grade: "111級", certs: [] },
+      { id: "111175128", name: "劉鎧睿", grade: "111級", certs: [] },
+      { id: "111175115", name: "蕭景勳", grade: "111級", certs: [] },
       { id: "111175116", name: "陳銘浩", grade: "111級", certs: [
         { name: "金融市場常識與職業道德", date: "2022/10/21" }, { name: "信託業務人員", date: "2023/05/28" },
         { name: "證券商業務人員", date: "2022/08/22" }, { name: "期貨商業務員", date: "2022/10/23" },
         { name: "投信投顧業務員", date: "2023/07/31" }, { name: "衍生性金融商品銷售人員資格測驗", date: "2024/09/18" },
         { name: "永續發展基礎能力測驗", date: "2024/12/01" }
+      ]},
+      { id: "111175304", name: "江惠敏", grade: "111級", certs: [
+        { name: "金融市場常識與職業道德", date: "2025/02/21" }, { name: "人身保險業務員", date: "2025/02/21" }
+      ]},
+      { id: "111175305", name: "林佑蓁", grade: "111級", certs: [{ name: "金融市場常識與職業道德", date: "2024/05/31" }] },
+      { id: "111175306", name: "徐翊瑄", grade: "111級", certs: [{ name: "金融市場常識與職業道德", date: "2023/02/01" }] },
+      { id: "111175307", name: "周漢樽", grade: "111級", certs: [] },
+      { id: "111175121", name: "林庭立", grade: "111級", certs: [] },
+      { id: "111175123", name: "林亮慈", grade: "111級", certs: [{ name: "TBSA商務企劃初階", date: "2025/05/29" }] },
+      { id: "111175310", name: "林佳樺", grade: "111級", certs: [{ name: "金融市場常識與職業道德", date: "2024/07/15" }] },
+      { id: "111175311", name: "丁羿云", grade: "111級", certs: [{ name: "金融市場常識與職業道德", date: "2024/02/23" }] },
+      { id: "111175313", name: "黃昱晨", grade: "111級", certs: [] },
+      { id: "111175314", name: "盧政宏", grade: "111級", certs: [] },
+      { id: "111175301", name: "才薇晴", grade: "111級", certs: [
+        { name: "金融市場常識與職業道德", date: "2025/03/15" }, { name: "信託業務人員", date: "2025/05/17" },
+        { name: "銀行內控與內稽", date: "2025/10/07" }, { name: "人身保險業務員", date: "2025/03/08" },
+        { name: "衍生性金融商品銷售人員資格測驗", date: "2025/11/11" }
+      ]},
+      { id: "111175303", name: "尤千慈", grade: "111級", certs: [{ name: "金融市場常識與職業道德", date: "2024/05/31" }] },
+      { id: "111175317", name: "黃郁炘", grade: "111級", certs: [
+        { name: "金融市場常識與職業道德", date: "2024/04/27" }, { name: "人身保險業務員", date: "2025/02/15" }
+      ]},
+      { id: "111175308", name: "劉明樺", grade: "111級", certs: [] },
+      { id: "111175309", name: "楊承諺", grade: "111級", certs: [] },
+      { id: "111175315", name: "彭琦媗", grade: "111級", certs: [{ name: "金融市場常識與職業道德", date: "2024/05/24" }] },
+      { id: "111175316", name: "邱宇辰", grade: "111級", certs: [] },
+      { id: "112A75003", name: "李冠男", grade: "111級", certs: [] },
+      { id: "111175129", name: "林庭岑", grade: "111級", certs: [{ name: "TBSA商務企劃初階", date: "2025/05/29" }] },
+      { id: "112175101", name: "馬範懿", grade: "112級", certs: [
+        { name: "金融市場常識與職業道德", date: "2024/02/16" }, { name: "人身保險業務員", date: "2026/02/07" },
+        { name: "企業內部控制", date: "2024/01/29" }, { name: "TBSA商務企劃初階", date: "2026/06/15" }
+      ]},
+      { id: "112175102", name: "劉昱辰", grade: "112級", certs: [{ name: "TBSA商務企劃初階", date: "2025/05/29" }] },
+      { id: "112175103", name: "林恩", grade: "112級", certs: [{ name: "TBSA商務企劃初階", date: "2025/05/29" }] },
+      { id: "112175107", name: "陳榕晟", grade: "112級", certs: [{ name: "TBSA商務企劃初階", date: "2025/05/29" }] },
+      { id: "112175108", name: "林亮吟", grade: "112級", certs: [] },
+      { id: "112175109", name: "彭毓庭", grade: "112級", certs: [
+        { name: "金融市場常識與職業道德", date: "2024/11/06" }, { name: "TBSA商務企劃初階", date: "2026/06/15" }
+      ]},
+      { id: "112175110", name: "劉承昱", grade: "112級", certs: [] },
+      { id: "112175113", name: "林萬立秉", grade: "112級", certs: [{ name: "TBSA商務企劃初階", date: "2025/05/29" }] },
+      { id: "112175114", name: "張馨尹", grade: "112級", certs: [{ name: "金融市場常識與職業道德", date: "2025/03/15" }] },
+      { id: "112175115", name: "廖心瑀", grade: "112級", certs: [
+        { name: "金融市場常識與職業道德", date: "2024/11/06" }, { name: "TBSA商務企劃初階", date: "2025/05/29" }
+      ]},
+      { id: "112175116", name: "林嘉純", grade: "112級", certs: [{ name: "TBSA商務企劃初階", date: "2025/05/29" }] },
+      { id: "112175104", name: "謝東穎", grade: "112級", certs: [] },
+      { id: "112175106", name: "黃靖芳", grade: "112級", certs: [{ name: "金融市場常識與職業道德", date: "2024/11/06" }] },
+      { id: "112175120", name: "林宏睿", grade: "112級", certs: [] },
+      { id: "112175121", name: "陳文豪", grade: "112級", certs: [] },
+      { id: "112175122", name: "廖洳靚", grade: "112級", certs: [] },
+      { id: "112175123", name: "葉清", grade: "112級", certs: [
+        { name: "金融市場常識與職業道德", date: "2024/11/06" }, { name: "信託業務人員", date: "2026/01/17" },
+        { name: "投信投顧業務員", date: "2026/03/03" }, { name: "TBSA商務企劃初階", date: "2025/05/29" },
+        { name: "多益", date: "2026/09/20" }
+      ]},
+      { id: "112175111", name: "許書慈", grade: "112級", certs: [{ name: "金融市場常識與職業道德", date: "2024/03/15" }] },
+      { id: "112175112", name: "陳家禎", grade: "112級", certs: [{ name: "金融市場常識與職業道德", date: "2024/11/06" }] },
+      { id: "112175303", name: "張凱翔", grade: "112級", certs: [] },
+      { id: "112175304", name: "王柏貫", grade: "112級", certs: [] },
+      { id: "112175306", name: "許琿傑", grade: "112級", certs: [{ name: "TBSA商務企劃初階", date: "2025/05/29" }] },
+      { id: "112175307", name: "謝紘宇", grade: "112級", certs: [] },
+      { id: "112175117", name: "李孟潔", grade: "112級", certs: [
+        { name: "金融市場常識與職業道德", date: "2024/09/14" }, { name: "TBSA商務企劃初階", date: "2025/05/29" }
+      ]},
+      { id: "112175118", name: "黃聿廷", grade: "112級", certs: [
+        { name: "金融市場常識與職業道德", date: "2024/09/06" }, { name: "信託業務人員", date: "2024/10/13" },
+        { name: "TBSA商務企劃初階", date: "2025/05/29" }
+      ]},
+      { id: "112175310", name: "葉昱完", grade: "112級", certs: [{ name: "TBSA商務企劃初階", date: "2025/05/29" }] },
+      { id: "112175311", name: "詹云鳶", grade: "112級", certs: [] },
+      { id: "112175312", name: "黃梧傑", grade: "112級", certs: [
+        { name: "金融市場常識與職業道德", date: "2024/08/01" }, { name: "人身保險業務員", date: "2024/08/01" },
+        { name: "投資型保險商品業務員", date: "2025/04/20" }, { name: "TBSA商務企劃初階", date: "2025/05/29" }
+      ]},
+      { id: "112175313", name: "楊礎安", grade: "112級", certs: [] },
+      { id: "112175301", name: "張霈旻", grade: "112級", certs: [] },
+      { id: "112175302", name: "李靖葶", grade: "112級", certs: [
+        { name: "金融市場常識與職業道德", date: "2024/11/06" }, { name: "TBSA商務企劃初階", date: "2025/05/29" }
+      ]},
+      { id: "112175314", name: "簡溥佑", grade: "112級", certs: [] },
+      { id: "112175315", name: "吳芷萱", grade: "112級", certs: [{ name: "金融市場常識與職業道德", date: "2024/11/06" }] },
+      { id: "112175316", name: "鍾偉誠", grade: "112級", certs: [] },
+      { id: "112175308", name: "吳芷儀", grade: "112級", certs: [{ name: "金融市場常識與職業道德", date: "2024/11/06" }] },
+      { id: "112175309", name: "李妍君", grade: "112級", certs: [
+        { name: "金融市場常識與職業道德", date: "2024/03/15" }, { name: "TBSA商務企劃初階", date: "2025/05/29" }
+      ]},
+      { id: "112175125", name: "游佳樺", grade: "112級", certs: [{ name: "TBSA商務企劃初階", date: "2025/05/29" }] },
+      { id: "113175101", name: "邱宥睿", grade: "113級", certs: [
+        { name: "理財規劃人員專業能力測驗", date: "2026/08/18" }, { name: "TBSA商務企劃初階", date: "2026/06/02" }
+      ]},
+      { id: "113175105", name: "陳品睿", grade: "113級", certs: [] },
+      { id: "113175106", name: "張民維", grade: "113級", certs: [
+        { name: "TBSA商務企劃初階", date: "2026/06/02" }, { name: "生成式AI", date: "2025/12/13" }
+      ]},
+      { id: "113175107", name: "劉靖鈴", grade: "113級", certs: [] },
+      { id: "113175108", name: "林姵妡", grade: "113級", certs: [
+        { name: "生成式AI", date: "2025/06/16" }, { name: "企業化永續管理師合格證書-碳盤查", date: "2025/06/20" },
+        { name: "企業化永續管理師合格證書-永續報告書", date: "2025/06/23" }
+      ]},
+      { id: "113175110", name: "彭岑顏", grade: "113級", certs: [
+        { name: "金融市場常識與職業道德", date: "2025/12/03" }, { name: "生成式AI", date: "2025/12/13" }
+      ]},
+      { id: "113175111", name: "許家瑜", grade: "113級", certs: [
+        { name: "TBSA商務企劃初階", date: "2026/06/02" }, { name: "生成式AI", date: "2025/06/16" },
+        { name: "生成式AI辦公室應用能力認證", date: "2026/04/26" }
       ]},
       { id: "113175112", name: "薛祺", grade: "113級", certs: [
         { name: "金融市場常識與職業道德", date: "2024/10/19" }, { name: "信託業務人員", date: "2026/06/30" },
@@ -507,260 +540,83 @@
         { name: "理財規劃人員專業能力測驗", date: "2026/10/02" }, { name: "TBSA商務企劃初階", date: "2026/06/02" },
         { name: "生成式AI", date: "2025/12/13" }
       ]},
+      { id: "113175113", name: "李立安", grade: "113級", certs: [] },
+      { id: "113175114", name: "任安琪", grade: "113級", certs: [] },
+      { id: "113175301", name: "許庭恩", grade: "113級", certs: [
+        { name: "TBSA商務企劃初階", date: "2026/06/02" }, { name: "生成式AI", date: "2025/12/13" },
+        { name: "企業化永續管理師合格證書-永續報告書", date: "2025/06/23" }, { name: "生成式AI辦公室應用能力認證", date: "2026/04/26" }
+      ]},
+      { id: "113175302", name: "鄭凱宸", grade: "113級", certs: [] },
+      { id: "113175303", name: "林筱茜", grade: "113級", certs: [
+        { name: "金融市場常識與職業道德", date: "2026/09/29" }, { name: "TBSA商務企劃初階", date: "2026/06/02" },
+        { name: "生成式AI", date: "2026/06/16" }
+      ]},
+      { id: "113175304", name: "謝博勛", grade: "113級", certs: [] },
+      { id: "113175305", name: "李御瑋", grade: "113級", certs: [] },
+      { id: "113175306", name: "林奕丞", grade: "113級", certs: [] },
+      { id: "113175307", name: "黃子芯", grade: "113級", certs: [
+        { name: "金融市場常識與職業道德", date: "2025/12/03" }, { name: "TBSA商務企劃初階", date: "2026/06/02" },
+        { name: "生成式AI", date: "2025/12/13" }, { name: "生成式AI辦公室應用能力認證", date: "2026/04/26" }
+      ]},
       { id: "114175001", name: "陳家佩", grade: "114級", certs: [
         { name: "金融市場常識與職業道德", date: "2025/04/19" }, { name: "信託業務人員", date: "2026/04/11" },
         { name: "銀行內控與內稽", date: "2026/03/14" }, { name: "證券商業務人員", date: "2025/08/03" },
         { name: "人身保險業務員", date: "2026/07/02" }, { name: "財產保險業務員", date: "2026/07/17" }
       ]},
-      { id: "112175123", name: "葉清", grade: "112級", certs: [
-        { name: "金融市場常識與職業道德", date: "2024/11/06" }, { name: "信託業務人員", date: "2026/01/17" },
-        { name: "投信投顧業務員", date: "2026/03/03" }, { name: "TBSA商務企劃初階", date: "2025/05/29" },
-        { name: "多益", date: "2026/09/20" }
-      ]},
-      { id: "111175110", name: "郭家瑜", grade: "111級", certs: [
-        { name: "金融市場常識與職業道德", date: "2023/08/16" }, { name: "信託業務人員", date: "2025/06/28" },
-        { name: "銀行內控與內稽", date: "2025/09/11" }, { name: "人身保險業務員", date: "2025/03/14" },
-        { name: "衍生性金融商品銷售人員資格測驗", date: "2025/11/11" }
-      ]},
-      { id: "111175301", name: "才薇晴", grade: "111級", certs: [
-        { name: "金融市場常識與職業道德", date: "2025/03/15" }, { name: "信託業務人員", date: "2025/05/17" },
-        { name: "銀行內控與內稽", date: "2025/10/07" }, { name: "人身保險業務員", date: "2025/03/08" },
-        { name: "衍生性金融商品銷售人員資格測驗", date: "2025/11/11" }
-      ]},
-      { id: "112175101", name: "馬範懿", grade: "112級", certs: [
-        { name: "金融市場常識與職業道德", date: "2024/02/16" }, { name: "人身保險業務員", date: "2026/02/07" },
-        { name: "企業內部控制", date: "2024/01/29" }, { name: "TBSA商務企劃初階", date: "2026/06/15" }
-      ]},
-      { id: "113175301", name: "許庭恩", grade: "113級", certs: [
-        { name: "TBSA商務企劃初階", date: "2026/06/02" }, { name: "生成式AI", date: "2025/12/13" },
-        { name: "企業化永續管理師合格證書-永續報告書", date: "2025/06/23" }, { name: "生成式AI辦公室應用能力認證", date: "2026/04/26" }
-      ]}
+      { id: "114175002", name: "黃信洲", grade: "114級", certs: [] },
+      { id: "114175004", name: "周芷聿", grade: "114級", certs: [] },
+      { id: "114175006", name: "莊嘉菱", grade: "114級", certs: [{ name: "金融市場常識與職業道德", date: "2026/07/01" }] },
+      { id: "114175011", name: "盧以昕", grade: "114級", certs: [] },
+      { id: "114175012", name: "林祐慶", grade: "114級", certs: [] },
+      { id: "114175013", name: "王騰毅", grade: "114級", certs: [] },
+      { id: "114175016", name: "倪浩翔", grade: "114級", certs: [] },
+      { id: "114175019", name: "葉彬文", grade: "114級", certs: [] },
+      { id: "114175051", name: "楊旻祐", grade: "114級", certs: [] },
+      { id: "114175052", name: "楊善婷", grade: "114級", certs: [] },
+      { id: "114175053", name: "許楷珽", grade: "114級", certs: [] },
+      { id: "114175009", name: "吳弘宇", grade: "114級", certs: [{ name: "金融市場常識與職業道德", date: "2026/07/01" }] },
+      { id: "114175010", name: "陳美妍", grade: "114級", certs: [{ name: "金融市場常識與職業道德", date: "2026/07/01" }] },
+      { id: "114175054", name: "鄭宜靜", grade: "114級", certs: [] },
+      { id: "114175056", name: "李柏均", grade: "114級", certs: [] },
+      { id: "114175057", name: "林芳竹", grade: "114級", certs: [] },
+      { id: "114175058", name: "黃子鈺", grade: "114級", certs: [] },
+      { id: "114175017", name: "呂宇恆", grade: "114級", certs: [{ name: "金融市場常識與職業道德", date: "2026/07/01" }] },
+      { id: "115175002", name: "林振揚", grade: "115級", certs: [] },
+      { id: "115175003", name: "陳亮宇", grade: "115級", certs: [] },
+      { id: "115175004", name: "古音鳥尹", grade: "115級", certs: [] },
+      { id: "115175005", name: "胡睿紘", grade: "115級", certs: [] },
+      { id: "115175006", name: "潘姿妍", grade: "115級", certs: [] },
+      { id: "115175007", name: "吳紹瓏", grade: "115級", certs: [] },
+      { id: "115175051", name: "陳良", grade: "115級", certs: [] },
+      { id: "115175058", name: "汪若楠", grade: "115級", certs: [] },
+      { id: "115175008", name: "柯冠妤", grade: "115級", certs: [] },
+      { id: "115175009", name: "李杰威", grade: "115級", certs: [] },
+      { id: "115175010", name: "賴玨澄", grade: "115級", certs: [] },
+      { id: "115175011", name: "黃鈺芸", grade: "115級", certs: [] },
+      { id: "115175012", name: "黃星文", grade: "115級", certs: [] },
+      { id: "115675001", name: "詹子毅", grade: "115級", certs: [] },
+      { id: "115175052", name: "蘇子晴", grade: "115級", certs: [] },
+      { id: "115175053", name: "李昱熹", grade: "115級", certs: [] },
+      { id: "115175055", name: "賴羿騏", grade: "115級", certs: [] },
+      { id: "115175056", name: "簡繁伊", grade: "115級", certs: [] },
+      { id: "115175057", name: "邱勝儒", grade: "115級", certs: [] }
     ];
 
-    // 嘗試從 LocalStorage 讀取名冊
-    const savedTeam = localStorage.getItem('dae_climbing_team_data');
-    if (savedTeam) {
+    let ALL_STUDENTS = [...DEFAULT_STUDENTS_LIST];
+
+    // 如果 LocalStorage 有新匯入的資料就讀取，否則預設使用完整名單
+    const saved = localStorage.getItem('dae_climbing_team_data_v2');
+    if (saved) {
       try {
-        ALL_STUDENTS = JSON.parse(savedTeam);
-      } catch (e) {
-        console.warn('無法讀取本機名冊快取');
-      }
-    }
-
-    // ================= 4. 個人修煉圖邏輯 =================
-    let currentCategory = 'ALL';
-    let personalCheckedCerts = {}; // { 'c1': '2024-02-23' }
-
-    function loadPersonalData() {
-      const saved = localStorage.getItem('dae_climbing_personal');
-      if (saved) {
-        try {
-          const data = JSON.parse(saved);
-          personalCheckedCerts = data.certs || {};
-          document.getElementById('user-name-input').value = data.name || '';
-          document.getElementById('user-grade-select').value = data.grade || '112級';
-        } catch (e) {}
-      }
-      renderCertList();
-      updatePersonalStats();
-    }
-
-    function savePersonalData() {
-      const data = {
-        name: document.getElementById('user-name-input').value,
-        grade: document.getElementById('user-grade-select').value,
-        certs: personalCheckedCerts
-      };
-      localStorage.setItem('dae_climbing_personal', JSON.stringify(data));
-      updatePersonalStats();
-    }
-
-    function renderCertList() {
-      const search = document.getElementById('cert-search-input').value.trim().toLowerCase();
-      const container = document.getElementById('cert-list-container');
-      container.innerHTML = '';
-
-      const filtered = CERT_DATABASE.filter(item => {
-        const matchCat = (currentCategory === 'ALL' || item.cat === currentCategory);
-        const matchSearch = item.name.toLowerCase().includes(search);
-        return matchCat && matchSearch;
-      });
-
-      if (filtered.length === 0) {
-        container.innerHTML = `<div class="p-8 text-center text-xs text-slate-400">查無符合條件的證照項目</div>`;
-        return;
-      }
-
-      filtered.forEach(cert => {
-        const isChecked = Boolean(personalCheckedCerts[cert.id]);
-        const dateVal = personalCheckedCerts[cert.id] || '';
-
-        const div = document.createElement('div');
-        div.className = `p-3 rounded-xl border transition flex items-center justify-between gap-3 ${
-          isChecked ? 'bg-blue-50/70 border-blue-200' : 'bg-slate-50 border-slate-200/80 hover:bg-slate-100/60'
-        }`;
-
-        div.innerHTML = `
-          <div class="flex items-center space-x-3 flex-1 min-w-0">
-            <input type="checkbox" id="chk-${cert.id}" ${isChecked ? 'checked' : ''} onchange="toggleCert('${cert.id}')" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer">
-            <label for="chk-${cert.id}" class="text-xs font-bold text-slate-700 truncate cursor-pointer select-none">
-              ${cert.name}
-            </label>
-          </div>
-          <div class="flex items-center space-x-2">
-            <input type="date" value="${dateVal}" onchange="changeCertDate('${cert.id}', this.value)" class="text-[11px] px-2 py-1 bg-white border border-slate-200 rounded-lg outline-none text-slate-600 focus:border-blue-500">
-            <span class="text-[10px] font-black px-2 py-0.5 rounded-full ${isChecked ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'}">
-              +${cert.meters}m
-            </span>
-          </div>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    function toggleCert(id) {
-      if (personalCheckedCerts[id]) {
-        delete personalCheckedCerts[id];
-      } else {
-        const today = new Date().toISOString().split('T')[0];
-        personalCheckedCerts[id] = today;
-      }
-      savePersonalData();
-      renderCertList();
-    }
-
-    function changeCertDate(id, dateStr) {
-      if (dateStr) {
-        personalCheckedCerts[id] = dateStr;
-      } else if (personalCheckedCerts[id]) {
-        delete personalCheckedCerts[id];
-      }
-      savePersonalData();
-      renderCertList();
-    }
-
-    function filterCategory(cat) {
-      currentCategory = cat;
-      document.querySelectorAll('.cat-btn').forEach(btn => {
-        if (btn.dataset.cat === cat) {
-          btn.className = 'cat-btn px-3 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white';
-        } else {
-          btn.className = 'cat-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200';
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 5) {
+          ALL_STUDENTS = parsed;
         }
-      });
-      renderCertList();
+      } catch(e){}
     }
 
-    function updatePersonalStats() {
-      let totalAltitude = 0;
-      let count = 0;
-
-      for (const [id] of Object.entries(personalCheckedCerts)) {
-        const item = CERT_DATABASE.find(c => c.id === id);
-        if (item) {
-          totalAltitude += item.meters;
-          count++;
-        }
-      }
-
-      totalAltitude = Math.min(3952, totalAltitude);
-
-      document.getElementById('current-altitude-txt').innerText = totalAltitude.toLocaleString();
-      document.getElementById('cert-count-txt').innerText = count;
-
-      // 橘貓小人移動動畫 (沿路徑 0m ~ 3952m)
-      const ratio = totalAltitude / 3952;
-      const avatar = document.getElementById('orange-cat-avatar');
-      // 依比例從底部 (55, 355) 到峰頂 (150, 45)
-      const targetLeft = 55 + ratio * (150 - 55);
-      const targetTop = 355 - ratio * (355 - 45);
-      avatar.style.left = `${targetLeft}px`;
-      avatar.style.top = `${targetTop}px`;
-
-      // 營地與裝備更新
-      updateMilestone(totalAltitude);
-      updateEquipment(count);
-    }
-
-    function updateMilestone(alt) {
-      const title = document.getElementById('milestone-title');
-      const desc = document.getElementById('milestone-desc');
-      if (alt >= 3952) {
-        title.innerText = '🏆 玉山主峰頂 (3,952m) - 傲視群峰！';
-        desc.innerText = '恭喜完全攻頂！已具備全方位金融與商管專業壁壘。';
-      } else if (alt >= 3400) {
-        title.innerText = '⛺ 排雲山莊 (3,402m) - 最後攻頂衝刺';
-        desc.innerText = '距離最高峰頂僅一步之遙，向專業分析師與研究員邁進！';
-      } else if (alt >= 2700) {
-        title.innerText = '🌲 白木林觀景台 (2,700m) - 核心業務站穩腳跟';
-        desc.innerText = '銀行、證券與外匯核心兼備，視野開闊！';
-      } else if (alt >= 1500) {
-        title.innerText = '🚩 孟祿亭 (1,800m) - 穩健前進中';
-        desc.innerText = '已掌握基本法定證照，體力充沛，繼續攀登！';
-      } else {
-        title.innerText = '🎒 塔塔加登山口 (0m) - 整裝出發';
-        desc.innerText = '踏出登山修煉的第一步，勾選考取之證照開始向上攀爬！';
-      }
-    }
-
-    function updateEquipment(count) {
-      const container = document.getElementById('equipment-container');
-      container.innerHTML = '';
-      const gears = [
-        { name: '多功能防滑登山杖', countReq: 1, icon: '🦯', desc: '站穩金融初階基本功' },
-        { name: '透光防風護目鏡', countReq: 3, icon: '🥽', desc: '看清市場波動合規視野' },
-        { name: '高頻衛星對講機', countReq: 5, icon: '📻', desc: '國際接軌與全方位資產規劃' },
-        { name: '高山金色攻頂冰鎬', countReq: 8, icon: '⛏️', desc: '突破專業極限與壁壘' }
-      ];
-
-      gears.forEach(g => {
-        const unlocked = count >= g.countReq;
-        const div = document.createElement('div');
-        div.className = `p-2.5 rounded-xl border flex items-center space-x-2.5 ${
-          unlocked ? 'bg-amber-50/60 border-amber-200 text-amber-900' : 'bg-slate-50 border-slate-200/60 text-slate-400 opacity-60'
-        }`;
-        div.innerHTML = `
-          <span class="text-xl">${g.icon}</span>
-          <div class="min-w-0">
-            <p class="font-bold text-[11px] truncate">${g.name}</p>
-            <p class="text-[9px] ${unlocked ? 'text-amber-700' : 'text-slate-400'}">${unlocked ? '已獲得' : `需累積 ${g.countReq} 張`}</p>
-          </div>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    function resetPersonalData() {
-      if (confirm('確定要清空個人勾選的所有證照紀錄嗎？')) {
-        personalCheckedCerts = {};
-        savePersonalData();
-        renderCertList();
-      }
-    }
-
-    // ================= 5. 全系登山大隊榜邏輯 =================
+    // 全系大隊視圖變數
     let currentGradeFilter = 'ALL';
-
-    function switchMainTab(tab) {
-      const vPersonal = document.getElementById('view-personal');
-      const vTeam = document.getElementById('view-team');
-      const btnP = document.getElementById('tab-btn-personal');
-      const btnT = document.getElementById('tab-btn-team');
-
-      if (tab === 'personal') {
-        vPersonal.classList.remove('hidden');
-        vTeam.classList.add('hidden');
-        btnP.className = 'px-4 py-1.5 rounded-lg text-sm font-bold transition flex items-center space-x-1.5 bg-white text-blue-600 shadow-sm';
-        btnT.className = 'px-4 py-1.5 rounded-lg text-sm font-bold transition flex items-center space-x-1.5 text-slate-600 hover:text-slate-900';
-      } else {
-        vPersonal.classList.add('hidden');
-        vTeam.classList.remove('hidden');
-        btnT.className = 'px-4 py-1.5 rounded-lg text-sm font-bold transition flex items-center space-x-1.5 bg-white text-blue-600 shadow-sm';
-        btnP.className = 'px-4 py-1.5 rounded-lg text-sm font-bold transition flex items-center space-x-1.5 text-slate-600 hover:text-slate-900';
-        renderTeamView();
-      }
-      lucide.createIcons();
-    }
 
     function filterGrade(grade) {
       currentGradeFilter = grade;
@@ -774,11 +630,6 @@
       renderTeamView();
     }
 
-    function renderTeamView() {
-      renderTeamPins();
-      renderTeamRoster();
-    }
-
     function getFilteredStudents() {
       const search = document.getElementById('team-search-input').value.trim().toLowerCase();
       return ALL_STUDENTS.filter(s => {
@@ -788,33 +639,36 @@
       });
     }
 
-    // 在玉山大地圖上散佈學生標記
+    function renderTeamView() {
+      renderTeamPins();
+      renderTeamRoster();
+    }
+
     function renderTeamPins() {
       const layer = document.getElementById('team-pins-layer');
       layer.innerHTML = '';
       const list = getFilteredStudents();
 
-      list.forEach((st, idx) => {
+      list.forEach(st => {
         const certCount = st.certs ? st.certs.length : 0;
         const altitude = calculateStudentAltitude(st.certs);
-
-        // 換算成地圖位置 (縱深比例)
         const ratio = altitude / 3952;
-        // 沿 S 型路徑散落，加入 hash 偏移避免重疊
-        const jitter = ((st.name.charCodeAt(0) * 17) % 70) - 35;
-        const topY = 480 - ratio * (480 - 70);
-        const baseX = 400 + Math.sin(ratio * Math.PI * 2.5) * 160;
-        const leftX = Math.max(50, Math.min(750, baseX + jitter));
+        
+        // 分散在山體 S 型路徑上，加入姓名雜湊防重疊
+        const jitter = ((st.name.charCodeAt(0) * 23) % 80) - 40;
+        const topY = 500 - ratio * (500 - 70);
+        const baseX = 400 + Math.sin(ratio * Math.PI * 2.5) * 150;
+        const leftX = Math.max(60, Math.min(740, baseX + jitter));
 
         const pin = document.createElement('div');
-        pin.className = 'absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-full hover:scale-125 transition-transform duration-200 z-10 group';
+        pin.className = 'absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-full hover:scale-125 transition-transform duration-200 z-10';
         pin.style.left = `${leftX}px`;
         pin.style.top = `${topY}px`;
         pin.onclick = () => openStudentModal(st);
 
         pin.innerHTML = `
           <div class="flex flex-col items-center">
-            <div class="px-1.5 py-0.5 rounded-full text-[9px] font-bold shadow-md whitespace-nowrap transition ${
+            <div class="px-1.5 py-0.5 rounded-full text-[9px] font-bold shadow-md whitespace-nowrap ${
               certCount >= 5 ? 'bg-amber-500 text-white' : certCount > 0 ? 'bg-blue-600 text-white' : 'bg-slate-600/80 text-white'
             }">
               ${st.name} (${certCount})
@@ -828,13 +682,11 @@
       });
     }
 
-    // 渲染右側排行榜清單
     function renderTeamRoster() {
       const container = document.getElementById('team-roster-list');
       container.innerHTML = '';
       const list = getFilteredStudents();
 
-      // 依考照張數與海拔排序
       list.sort((a, b) => {
         const countA = a.certs ? a.certs.length : 0;
         const countB = b.certs ? b.certs.length : 0;
@@ -845,7 +697,7 @@
       document.getElementById('roster-count-txt').innerText = `${list.length} 人`;
 
       if (list.length === 0) {
-        container.innerHTML = `<div class="p-8 text-center text-xs text-slate-400">查無名冊資料</div>`;
+        container.innerHTML = `<div class="p-8 text-center text-xs text-slate-400">查無學生資料</div>`;
         return;
       }
 
@@ -859,9 +711,7 @@
 
         card.innerHTML = `
           <div class="flex items-center space-x-3 min-w-0">
-            <span class="w-5 text-center text-xs font-black ${idx < 3 ? 'text-amber-500' : 'text-slate-400'}">
-              ${idx + 1}
-            </span>
+            <span class="w-5 text-center text-xs font-black ${idx < 3 ? 'text-amber-500' : 'text-slate-400'}">${idx + 1}</span>
             <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center text-base">🐱</div>
             <div class="truncate">
               <p class="text-xs font-bold text-slate-800 truncate">${st.name} <span class="text-[10px] text-slate-400 font-normal">(${st.grade})</span></p>
@@ -880,7 +730,7 @@
       });
     }
 
-    // ================= 6. 學生手冊 Modal 互動 =================
+    // Modal
     function openStudentModal(student) {
       const modal = document.getElementById('student-modal');
       const certCount = student.certs ? student.certs.length : 0;
@@ -892,30 +742,24 @@
       document.getElementById('modal-student-altitude').innerText = `${altitude.toLocaleString()} m`;
       document.getElementById('modal-student-count').innerText = `${certCount} 張`;
 
-      const certsListContainer = document.getElementById('modal-student-certs');
-      certsListContainer.innerHTML = '';
+      const certsContainer = document.getElementById('modal-student-certs');
+      certsContainer.innerHTML = '';
 
       if (certCount === 0) {
-        certsListContainer.innerHTML = `
-          <div class="p-6 text-center text-slate-400 bg-white rounded-xl border border-slate-100">
-            尚無已登記之證照，正在登山口整裝待發！
-          </div>
-        `;
+        certsContainer.innerHTML = `<div class="p-6 text-center text-slate-400 bg-slate-50 rounded-xl">尚無考取紀錄，在登山口整裝待發！</div>`;
       } else {
         student.certs.forEach(c => {
           const meters = getCertPoints(c.name);
           const item = document.createElement('div');
-          item.className = 'p-2.5 bg-white rounded-xl border border-slate-100 flex items-center justify-between shadow-sm';
+          item.className = 'p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center justify-between';
           item.innerHTML = `
             <div class="min-w-0 pr-2">
               <p class="font-bold text-slate-700 truncate">${c.name}</p>
               <p class="text-[10px] text-slate-400">考取日期：${c.date || '無紀錄'}</p>
             </div>
-            <span class="px-2 py-0.5 bg-blue-50 text-blue-600 font-black rounded-lg text-[10px] whitespace-nowrap">
-              +${meters} m
-            </span>
+            <span class="px-2 py-0.5 bg-blue-50 text-blue-600 font-black rounded-lg text-[10px] whitespace-nowrap">+${meters} m</span>
           `;
-          certsListContainer.appendChild(item);
+          certsContainer.appendChild(item);
         });
       }
 
@@ -927,94 +771,166 @@
       document.getElementById('student-modal').classList.add('hidden');
     }
 
-    // ================= 7. 批次匯入 Modal =================
-    function openImportModal() {
-      document.getElementById('import-modal').classList.remove('hidden');
-    }
+    // Tab 切換
+    function switchMainTab(tab) {
+      const vPersonal = document.getElementById('view-personal');
+      const vTeam = document.getElementById('view-team');
+      const btnP = document.getElementById('tab-btn-personal');
+      const btnT = document.getElementById('tab-btn-team');
 
-    function closeImportModal() {
-      document.getElementById('import-modal').classList.add('hidden');
-    }
-
-    function confirmImportData() {
-      const text = document.getElementById('import-json-textarea').value.trim();
-      if (!text) {
-        alert('請先貼上 JSON 格式名冊資料');
-        return;
-      }
-      try {
-        const parsed = JSON.parse(text);
-        if (!Array.isArray(parsed)) {
-          alert('資料格式有誤，最外層必須是陣列 [ ... ]');
-          return;
-        }
-
-        ALL_STUDENTS = parsed;
-        localStorage.setItem('dae_climbing_team_data', JSON.stringify(ALL_STUDENTS));
-        closeImportModal();
-        renderTeamView();
-        alert(`成功匯入 ${ALL_STUDENTS.length} 位同學的考照名冊與登山高度！`);
-      } catch (err) {
-        alert(`解析錯誤，請檢查語法: ${err.message}`);
-      }
-    }
-
-    function restoreDefaultData() {
-      if (confirm('確定要還原成初始名冊資料嗎？')) {
-        localStorage.removeItem('dae_climbing_team_data');
-        location.reload();
-      }
-    }
-
-    // ================= 8. 匯出登頂卡片 =================
-    function exportSummitCard() {
-      const name = document.getElementById('user-name-input').value.trim() || '經濟系同學';
-      const grade = document.getElementById('user-grade-select').value;
-      const card = document.getElementById('summit-card-export');
-
-      let alt = 0;
-      let count = 0;
-      const certNames = [];
-
-      for (const [id] of Object.entries(personalCheckedCerts)) {
-        const item = CERT_DATABASE.find(c => c.id === id);
-        if (item) {
-          alt += item.meters;
-          count++;
-          certNames.push(item.name);
-        }
-      }
-      alt = Math.min(3952, alt);
-
-      document.getElementById('card-export-name').innerText = name;
-      document.getElementById('card-export-grade').innerText = grade;
-      document.getElementById('card-export-alt').innerText = `${alt.toLocaleString()} m`;
-      document.getElementById('card-export-count').innerText = `${count} 張`;
-
-      const listContainer = document.getElementById('card-export-certs');
-      listContainer.innerHTML = '';
-      if (certNames.length === 0) {
-        listContainer.innerHTML = '<span>尚在登山口蓄勢待發</span>';
+      if (tab === 'personal') {
+        vPersonal.classList.remove('hidden');
+        vTeam.classList.add('hidden');
+        btnP.className = 'px-4 py-1.5 rounded-lg text-sm font-bold transition flex items-center space-x-1.5 bg-white text-blue-600 shadow-sm';
+        btnT.className = 'px-4 py-1.5 rounded-lg text-sm font-bold transition flex items-center space-x-1.5 text-slate-600 hover:text-slate-900';
+        renderCertList();
+        updatePersonalStats();
       } else {
-        certNames.forEach(n => {
-          const s = document.createElement('span');
-          s.className = 'truncate bg-white/10 px-2 py-1 rounded';
-          s.innerText = `✔ ${n}`;
-          listContainer.appendChild(s);
-        });
+        vPersonal.classList.add('hidden');
+        vTeam.classList.remove('hidden');
+        btnT.className = 'px-4 py-1.5 rounded-lg text-sm font-bold transition flex items-center space-x-1.5 bg-white text-blue-600 shadow-sm';
+        btnP.className = 'px-4 py-1.5 rounded-lg text-sm font-bold transition flex items-center space-x-1.5 text-slate-600 hover:text-slate-900';
+        renderTeamView();
       }
+      lucide.createIcons();
+    }
 
-      html2canvas(card, { scale: 2 }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `${name}_經濟百岳登山證書.png`;
-        link.href = canvas.toDataURL();
-        link.click();
+    // 個人修煉圖邏輯
+    let currentCategory = 'ALL';
+    let personalCheckedCerts = {};
+
+    function renderCertList() {
+      const search = document.getElementById('cert-search-input').value.trim().toLowerCase();
+      const container = document.getElementById('cert-list-container');
+      container.innerHTML = '';
+
+      const filtered = CERT_DATABASE.filter(item => {
+        const matchCat = (currentCategory === 'ALL' || item.cat === currentCategory);
+        const matchSearch = item.name.toLowerCase().includes(search);
+        return matchCat && matchSearch;
+      });
+
+      filtered.forEach(cert => {
+        const isChecked = Boolean(personalCheckedCerts[cert.id]);
+        const dateVal = personalCheckedCerts[cert.id] || '';
+
+        const div = document.createElement('div');
+        div.className = `p-3 rounded-xl border transition flex items-center justify-between gap-3 ${
+          isChecked ? 'bg-blue-50/70 border-blue-200' : 'bg-slate-50 border-slate-200/80 hover:bg-slate-100/60'
+        }`;
+        div.innerHTML = `
+          <div class="flex items-center space-x-3 flex-1 min-w-0">
+            <input type="checkbox" id="chk-${cert.id}" ${isChecked ? 'checked' : ''} onchange="toggleCert('${cert.id}')" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer">
+            <label for="chk-${cert.id}" class="text-xs font-bold text-slate-700 truncate cursor-pointer select-none">${cert.name}</label>
+          </div>
+          <div class="flex items-center space-x-2">
+            <input type="date" value="${dateVal}" onchange="changeCertDate('${cert.id}', this.value)" class="text-[11px] px-2 py-1 bg-white border border-slate-200 rounded-lg outline-none text-slate-600 focus:border-blue-500">
+            <span class="text-[10px] font-black px-2 py-0.5 rounded-full ${isChecked ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'}">+${cert.meters}m</span>
+          </div>
+        `;
+        container.appendChild(div);
       });
     }
 
-    // 初始化載入
+    function toggleCert(id) {
+      if (personalCheckedCerts[id]) delete personalCheckedCerts[id];
+      else personalCheckedCerts[id] = new Date().toISOString().split('T')[0];
+      updatePersonalStats();
+      renderCertList();
+    }
+
+    function changeCertDate(id, dateStr) {
+      if (dateStr) personalCheckedCerts[id] = dateStr;
+      else delete personalCheckedCerts[id];
+      updatePersonalStats();
+      renderCertList();
+    }
+
+    function filterCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.className = (btn.dataset.cat === cat)
+          ? 'cat-btn px-3 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white'
+          : 'cat-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200';
+      });
+      renderCertList();
+    }
+
+    function updatePersonalStats() {
+      let totalAltitude = 0, count = 0;
+      for (const [id] of Object.entries(personalCheckedCerts)) {
+        const item = CERT_DATABASE.find(c => c.id === id);
+        if (item) { totalAltitude += item.meters; count++; }
+      }
+      totalAltitude = Math.min(3952, totalAltitude);
+
+      document.getElementById('current-altitude-txt').innerText = totalAltitude.toLocaleString();
+      document.getElementById('cert-count-txt').innerText = count;
+
+      const ratio = totalAltitude / 3952;
+      const avatar = document.getElementById('orange-cat-avatar');
+      avatar.style.left = `${55 + ratio * (150 - 55)}px`;
+      avatar.style.top = `${355 - ratio * (355 - 45)}px`;
+
+      // 裝備欄
+      const eqContainer = document.getElementById('equipment-container');
+      eqContainer.innerHTML = '';
+      const gears = [
+        { name: '多功能防滑登山杖', req: 1, icon: '🦯' },
+        { name: '透光防風護目鏡', req: 3, icon: '🥽' },
+        { name: '高頻衛星對講機', req: 5, icon: '📻' },
+        { name: '高山金色攻頂冰鎬', req: 8, icon: '⛏️' }
+      ];
+      gears.forEach(g => {
+        const ok = count >= g.req;
+        const div = document.createElement('div');
+        div.className = `p-2 rounded-xl border flex items-center space-x-2 ${ok ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-slate-50 border-slate-200/60 text-slate-400 opacity-60'}`;
+        div.innerHTML = `<span class="text-lg">${g.icon}</span><span class="font-bold text-[11px] truncate">${g.name}</span>`;
+        eqContainer.appendChild(div);
+      });
+    }
+
+    function resetPersonalData() {
+      if (confirm('確定清空個人勾選紀錄？')) {
+        personalCheckedCerts = {};
+        updatePersonalStats();
+        renderCertList();
+      }
+    }
+
+    // 匯入 Modal
+    function openImportModal() { document.getElementById('import-modal').classList.remove('hidden'); }
+    function closeImportModal() { document.getElementById('import-modal').classList.add('hidden'); }
+    function confirmImportData() {
+      const text = document.getElementById('import-json-textarea').value.trim();
+      if (!text) return;
+      try {
+        const parsed = JSON.parse(text);
+        if (Array.isArray(parsed)) {
+          ALL_STUDENTS = parsed;
+          localStorage.setItem('dae_climbing_team_data_v2', JSON.stringify(ALL_STUDENTS));
+          closeImportModal();
+          renderTeamView();
+          alert(`成功更新 ${ALL_STUDENTS.length} 位同學名冊！`);
+        }
+      } catch (e) {
+        alert('解析失敗，請確認格式');
+      }
+    }
+    function restoreDefaultData() {
+      if (confirm('確定還原為原始內建模單？')) {
+        localStorage.removeItem('dae_climbing_team_data_v2');
+        ALL_STUDENTS = [...DEFAULT_STUDENTS_LIST];
+        closeImportModal();
+        renderTeamView();
+      }
+    }
+
+    // 初始化
     window.addEventListener('DOMContentLoaded', () => {
-      loadPersonalData();
+      // 清理舊版快取避免衝突
+      localStorage.removeItem('dae_climbing_team_data');
+      renderTeamView();
       lucide.createIcons();
     });
   </script>
