@@ -2,38 +2,41 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>經濟系考照百岳修煉圖・宜蘭礁溪即時連動版</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
-    body { font-family: 'Zen Maru Gothic', 'Noto Sans TC', sans-serif; }
+    body { font-family: 'Zen Maru Gothic', 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
     
-    .custom-scroll::-webkit-scrollbar { width: 6px; }
+    .custom-scroll::-webkit-scrollbar { width: 4px; }
     .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
     .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* 手機橫向滾動條隱藏但可滑動 */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
     /* 雨滴動畫 */
     .rain-drop {
       position: absolute;
       background: linear-gradient(transparent, rgba(255, 255, 255, 0.7));
       width: 1.5px;
-      height: 14px;
+      height: 12px;
       animation: fall linear infinite;
       pointer-events: none;
     }
     @keyframes fall {
       0% { transform: translateY(-20px) translateX(0); opacity: 0; }
       20% { opacity: 0.8; }
-      100% { transform: translateY(540px) translateX(-20px); opacity: 0.2; }
+      100% { transform: translateY(480px) translateX(-20px); opacity: 0.2; }
     }
 
     /* 主任打氣氣泡緩慢浮動 */
     @keyframes bubbleFloat {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-4px); }
+      50% { transform: translateY(-3px); }
     }
     .speech-bubble {
       animation: bubbleFloat 4s ease-in-out infinite;
@@ -48,43 +51,42 @@
       animation: walkBounce 2.5s ease-in-out infinite;
     }
 
-    /* 手繪山岳筆觸 */
     .crayon-style {
       stroke-linecap: round;
       stroke-linejoin: round;
     }
   </style>
 </head>
-<body class="bg-[#fcfaf7] text-slate-800 min-h-screen flex flex-col">
+<body class="bg-[#fcfaf7] text-slate-800 min-h-screen flex flex-col selection:bg-amber-100">
 
-  <!-- 頂部導航列 -->
-  <header class="bg-white/90 backdrop-blur-md border-b border-amber-100 sticky top-0 z-40 shadow-xs">
-    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-black text-xl shadow-inner">
+  <!-- 頂部導航列（手機版自動適配高度） -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-amber-100 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2">
+      <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black text-base sm:text-xl shadow-inner shrink-0">
           ⛰️
         </div>
-        <div>
-          <h1 class="font-black text-lg md:text-xl text-slate-800 tracking-tight leading-tight flex items-center gap-1.5">
+        <div class="min-w-0">
+          <h1 class="font-black text-sm sm:text-lg text-slate-800 tracking-tight leading-tight truncate flex items-center gap-1">
             經濟百岳修煉圖
-            <span class="text-xs font-bold px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full">宜蘭礁溪天氣實況</span>
+            <span class="text-[9px] sm:text-xs font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded-full shrink-0">礁溪連動</span>
           </h1>
-          <p class="text-xs text-slate-400 hidden sm:block">佛光大學應用經濟學系・證照登山大隊</p>
+          <p class="text-[10px] sm:text-xs text-slate-400 truncate">佛光大學應用經濟學系</p>
         </div>
       </div>
 
-      <!-- 右側資訊：雲端同步狀態與礁溪天氣 -->
-      <div class="flex items-center space-x-2 sm:space-x-3">
-        <div id="sync-status" class="hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>雲端已自動連動</span>
+      <!-- 右側資訊：雲端狀態與天氣 -->
+      <div class="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
+        <div id="sync-status" class="hidden md:flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>連動中</span>
         </div>
 
-        <div class="flex items-center space-x-2 bg-amber-50/80 border border-amber-200/60 px-3 py-1.5 rounded-2xl">
-          <span id="weather-icon" class="text-xl">🌤️</span>
-          <div class="text-left text-xs leading-tight">
-            <p class="font-black text-slate-700" id="weather-temp">宜蘭礁溪 --°C</p>
-            <p class="text-[10px] text-amber-700 font-medium" id="weather-desc">連線天氣中...</p>
+        <div class="flex items-center space-x-1 sm:space-x-2 bg-amber-50/80 border border-amber-200/60 px-2 sm:px-3 py-1 rounded-xl">
+          <span id="weather-icon" class="text-base sm:text-lg">🌤️</span>
+          <div class="text-left text-[10px] sm:text-xs leading-tight">
+            <p class="font-black text-slate-700" id="weather-temp">--°C</p>
+            <p class="text-[8px] sm:text-[10px] text-amber-700 font-medium hidden sm:block" id="weather-desc">連線中</p>
           </div>
         </div>
       </div>
@@ -92,18 +94,20 @@
   </header>
 
   <!-- 主內容區 -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col gap-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 md:p-6 flex flex-col gap-4 sm:gap-6">
 
-    <!-- 年級狀態切換卡片列 -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3" id="grade-summary-cards"></div>
+    <!-- 年級切換卡片列（手機端支援橫向順暢滑動，不佔垂直空間） -->
+    <div class="flex overflow-x-auto no-scrollbar gap-2.5 sm:grid sm:grid-cols-3 lg:grid-cols-6 pb-1" id="grade-summary-cards"></div>
 
-    <!-- 控制列：統計摘要與姓名學號搜尋 -->
-    <div class="bg-white rounded-2xl p-4 border border-amber-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
-      <div class="flex items-center space-x-2 text-xs text-slate-500">
+    <!-- 控制列：統計摘要與搜尋 -->
+    <div class="bg-white rounded-2xl p-3 sm:p-4 border border-amber-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center justify-between w-full sm:w-auto text-xs text-slate-500 overflow-x-auto whitespace-nowrap">
         <span class="font-bold text-slate-800" id="current-filter-title">全體學生狀態</span>
-        <span>・共 <b id="stat-total-students" class="text-blue-600">0</b> 人</span>
-        <span>・已考取 <b id="stat-certified-students" class="text-emerald-600">0</b> 人</span>
-        <span>・累計考取 <b id="stat-total-certs" class="text-amber-600">0</b> 張</span>
+        <div class="flex items-center space-x-2 ml-2">
+          <span>・共 <b id="stat-total-students" class="text-blue-600">0</b> 人</span>
+          <span>・已考取 <b id="stat-certified-students" class="text-emerald-600">0</b> 人</span>
+          <span>・總張數 <b id="stat-total-certs" class="text-amber-600">0</b> 張</span>
+        </div>
       </div>
 
       <div class="flex items-center space-x-2 w-full sm:w-auto">
@@ -111,94 +115,83 @@
           <input type="text" id="team-search-input" oninput="renderTeamView()" placeholder="搜尋姓名或學號..." class="w-full pl-8 pr-3 py-1.5 bg-amber-50/40 border border-amber-200/80 rounded-xl text-xs outline-none focus:bg-white focus:ring-2 focus:ring-amber-500">
           <i data-lucide="search" class="w-3.5 h-3.5 text-amber-400 absolute left-2.5 top-2.5"></i>
         </div>
-        <button onclick="fetchLiveDataFromGoogleSheet(true)" title="立即從試算表重新整理" class="p-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-xl transition flex items-center justify-center">
+        <button onclick="fetchLiveDataFromGoogleSheet(true)" title="重新整理試算表" class="p-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-xl transition flex items-center justify-center shrink-0">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
         </button>
       </div>
     </div>
 
-    <!-- 雙欄架構：左側手繪大山、右側排行榜 -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- 雙欄架構：手機版自動垂直堆疊 -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
       
-      <!-- 左側：手繪水彩風格百岳全景圖 -->
-      <div class="lg:col-span-8 bg-white rounded-3xl p-5 border border-amber-100 shadow-sm flex flex-col">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="font-black text-sm text-slate-800 flex items-center space-x-1.5">
-            <span class="text-base">🥾</span>
-            <span>經濟登山客・即時動態（背景隨礁溪日照天色與天氣變換）</span>
+      <!-- 左側：手繪水彩風格百岳全景圖（自適應高度） -->
+      <div class="lg:col-span-8 bg-white rounded-3xl p-3 sm:p-5 border border-amber-100 shadow-sm flex flex-col">
+        <div class="flex items-center justify-between mb-2 sm:mb-3">
+          <h2 class="font-black text-xs sm:text-sm text-slate-800 flex items-center space-x-1">
+            <span>🥾</span>
+            <span>玉山攀登動態（礁溪天氣實況連動）</span>
           </h2>
-          <div class="flex items-center space-x-2 text-[10px] text-slate-400">
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-purple-500"></span> 111級
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-500"></span> 112級
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500"></span> 113級
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500"></span> 114級
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-pink-500"></span> 115級
+          <div class="flex items-center space-x-1.5 text-[9px] sm:text-[10px] text-slate-400">
+            <span class="inline-block w-2 h-2 rounded-full bg-purple-500"></span> 111
+            <span class="inline-block w-2 h-2 rounded-full bg-blue-500"></span> 112
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span> 113
+            <span class="inline-block w-2 h-2 rounded-full bg-amber-500"></span> 114
+            <span class="inline-block w-2 h-2 rounded-full bg-pink-500"></span> 115
           </div>
         </div>
 
-        <!-- 畫布容器（天色背景隨時間漸層變化） -->
-        <div id="sky-canvas-container" class="relative w-full h-[540px] rounded-2xl overflow-hidden border border-amber-200/80 shadow-inner transition-colors duration-1000">
+        <!-- 畫布容器（手機端高度 380px，電腦端 520px，完美防遮擋） -->
+        <div id="sky-canvas-container" class="relative w-full h-[380px] sm:h-[460px] md:h-[520px] rounded-2xl overflow-hidden border border-amber-200/80 shadow-inner transition-colors duration-1000">
           
           <!-- 動態雨滴圖層 -->
           <div id="rain-layer" class="absolute inset-0 pointer-events-none hidden"></div>
 
-          <!-- 太陽 / 月亮 / 浮雲背景元素 -->
-          <div id="celestial-body" class="absolute transition-all duration-1000" style="right: 50px; top: 40px;">
-            <div id="celestial-graphic" class="w-14 h-14 rounded-full bg-amber-400 shadow-[0_0_30px_rgba(251,191,36,0.6)] flex items-center justify-center text-2xl">
+          <!-- 太陽 / 月亮 -->
+          <div id="celestial-body" class="absolute transition-all duration-1000" style="right: 30px; top: 25px;">
+            <div id="celestial-graphic" class="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-amber-400 shadow-[0_0_25px_rgba(251,191,36,0.6)] flex items-center justify-center text-xl sm:text-2xl">
               ☀️
             </div>
           </div>
 
-          <!-- 手繪水彩山岳 SVG -->
-          <svg class="w-full h-full crayon-style" viewBox="0 0 800 540" preserveAspectRatio="none">
-            <!-- 遠景淡霧山巒 -->
-            <path d="M 50,540 Q 200,320 350,330 T 650,280 T 800,400 L 800,540 Z" fill="#9dbfb1" opacity="0.4"/>
-            <path d="M 0,540 Q 180,260 400,240 T 780,290 L 800,540 Z" fill="#7fa99b" opacity="0.5"/>
+          <!-- 手繪水彩山岳 SVG（視窗比自適應） -->
+          <svg class="w-full h-full crayon-style" viewBox="0 0 800 520" preserveAspectRatio="none">
+            <path d="M 50,520 Q 200,310 350,320 T 650,270 T 800,390 L 800,520 Z" fill="#9dbfb1" opacity="0.4"/>
+            <path d="M 0,520 Q 180,250 400,230 T 780,280 L 800,520 Z" fill="#7fa99b" opacity="0.5"/>
 
-            <!-- 主峰山體（手繪圓潤山形） -->
-            <path d="M 120,540 C 220,380 290,160 380,80 C 410,50 430,50 460,80 C 540,170 620,380 720,540 Z" fill="#4d7c66"/>
-            
-            <!-- 山腰植被與層次水彩點綴 -->
-            <path d="M 210,480 C 270,390 320,260 380,180 C 410,140 430,140 460,180 C 510,250 560,390 630,480 Z" fill="#3b6552" opacity="0.85"/>
-            
-            <!-- 手繪白雪山帽 -->
-            <path d="M 370,105 C 385,80 400,65 420,65 C 440,65 455,80 470,105 C 460,120 445,115 435,130 C 425,120 410,125 400,135 C 390,120 380,125 370,105 Z" fill="#ffffff" opacity="0.95"/>
+            <path d="M 120,520 C 220,370 290,150 380,75 C 410,45 430,45 460,75 C 540,160 620,370 720,520 Z" fill="#4d7c66"/>
+            <path d="M 210,460 C 270,380 320,250 380,170 C 410,135 430,135 460,170 C 510,240 560,380 630,460 Z" fill="#3b6552" opacity="0.85"/>
+            <path d="M 370,100 C 385,75 400,60 420,60 C 440,60 455,75 470,100 C 460,115 445,110 435,125 C 425,115 410,120 400,130 C 390,115 380,120 370,100 Z" fill="#ffffff" opacity="0.95"/>
 
-            <!-- 山前圓潤矮丘 -->
-            <path d="M 40,540 C 80,450 160,420 220,450 C 280,480 320,540 340,540 Z" fill="#88b04b" opacity="0.9"/>
-            <path d="M 580,540 C 620,440 700,430 760,470 L 800,540 Z" fill="#c9a859" opacity="0.9"/>
+            <path d="M 40,520 C 80,440 160,410 220,440 C 280,470 320,520 340,520 Z" fill="#88b04b" opacity="0.9"/>
+            <path d="M 580,520 C 620,430 700,420 760,460 L 800,520 Z" fill="#c9a859" opacity="0.9"/>
 
-            <!-- 手繪蜿蜒盤山山徑 -->
-            <path id="real-mountain-path" d="M 240,510 Q 340,460 480,430 T 290,320 T 490,210 T 415,80" fill="none" stroke="#f6ecc9" stroke-width="8" stroke-dasharray="10,6" stroke-linecap="round"/>
+            <path id="real-mountain-path" d="M 240,490 Q 340,440 480,410 T 290,305 T 490,200 T 415,75" fill="none" stroke="#f6ecc9" stroke-width="8" stroke-dasharray="10,6" stroke-linecap="round"/>
 
-            <!-- 營地標註線與地標 -->
-            <line x1="80" y1="80" x2="720" y2="80" stroke="#f43f5e" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.6"/>
-            <text x="95" y="75" font-size="12" font-weight="900" fill="#e11d48">🚩 玉山主峰頂 (3,952m)</text>
+            <line x1="60" y1="75" x2="740" y2="75" stroke="#f43f5e" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.6"/>
+            <text x="80" y="70" font-size="12" font-weight="900" fill="#e11d48">🚩 玉山主峰頂 (3,952m)</text>
 
-            <line x1="80" y1="210" x2="720" y2="210" stroke="#ea580c" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.6"/>
-            <text x="95" y="205" font-size="11" font-weight="bold" fill="#c2410c">⛺ 排雲山莊 (3,402m)</text>
+            <line x1="60" y1="200" x2="740" y2="200" stroke="#ea580c" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.6"/>
+            <text x="80" y="195" font-size="11" font-weight="bold" fill="#c2410c">⛺ 排雲山莊 (3,402m)</text>
 
-            <line x1="80" y1="320" x2="720" y2="320" stroke="#2563eb" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.6"/>
-            <text x="95" y="315" font-size="11" font-weight="bold" fill="#1d4ed8">🌲 白木林觀景台 (2,700m)</text>
+            <line x1="60" y1="305" x2="740" y2="305" stroke="#2563eb" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.6"/>
+            <text x="80" y="300" font-size="11" font-weight="bold" fill="#1d4ed8">🌲 白木林觀景台 (2,700m)</text>
 
-            <line x1="80" y1="430" x2="720" y2="430" stroke="#059669" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.6"/>
-            <text x="95" y="425" font-size="11" font-weight="bold" fill="#047857">🛖 孟祿亭 (1,800m)</text>
+            <line x1="60" y1="415" x2="740" y2="415" stroke="#059669" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.6"/>
+            <text x="80" y="410" font-size="11" font-weight="bold" fill="#047857">🛖 孟祿亭 (1,800m)</text>
           </svg>
 
-          <!-- 學生公仔圖層 (無外框圓圈，純公仔立體小人) -->
+          <!-- 學生公仔圖層（無圓框） -->
           <div id="team-pins-layer" class="absolute inset-0 pointer-events-none"></div>
 
           <!-- 系主任慢速巡山 NPC -->
-          <div id="director-npc" class="absolute pointer-events-auto cursor-pointer z-30" style="left: 420px; top: 230px; transform: translate(-50%, -100%); transition: left 4s ease-in-out, top 4s ease-in-out;">
-            <!-- 主任打氣氣泡 -->
-            <div class="speech-bubble relative -top-2 bg-amber-400 text-slate-900 text-[11px] font-black px-3 py-1.5 rounded-2xl shadow-lg border-2 border-white whitespace-nowrap">
+          <div id="director-npc" class="absolute pointer-events-auto cursor-pointer z-30" style="left: 52%; top: 40%; transform: translate(-50%, -100%); transition: left 4s ease-in-out, top 4s ease-in-out;">
+            <div class="speech-bubble relative -top-1.5 bg-amber-400 text-slate-900 text-[9px] sm:text-[11px] font-black px-2 sm:px-3 py-1 rounded-2xl shadow-lg border border-white whitespace-nowrap">
               <span id="director-quote">今天礁溪天氣不錯，大家多考一張！</span>
-              <div class="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-amber-400 rotate-45 border-r-2 border-b-2 border-white"></div>
+              <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-amber-400 rotate-45 border-r border-b border-white"></div>
             </div>
             
-            <!-- 主任公仔造型：俐落短油頭、單眼皮微笑、深灰西裝與深藍襯衫 -->
             <div class="flex flex-col items-center select-none">
-              <svg width="42" height="62" viewBox="0 0 50 74" class="drop-shadow-lg">
+              <svg width="34" height="52" viewBox="0 0 50 74" class="drop-shadow-md sm:w-[42px] sm:h-[62px]">
                 <path d="M 14,18 C 11,13 13,6 20,4 C 26,2 35,3 41,7 C 44,10 44,17 38,19 C 32,20 18,21 14,18 Z" fill="#1c1917"/>
                 <path d="M 12,17 C 11,21 14,23 15,23 C 14,18 15,15 17,14 Z" fill="#1c1917"/>
                 <circle cx="28" cy="22" r="13" fill="#fed7aa"/>
@@ -220,79 +213,77 @@
                 <rect x="18" y="67" width="8" height="4" rx="1.5" fill="#0f172a"/>
                 <rect x="30" y="67" width="8" height="4" rx="1.5" fill="#0f172a"/>
               </svg>
-              <span class="mt-0.5 bg-slate-800 text-amber-300 border border-amber-300/40 text-[9px] px-2 py-0.2 rounded-full font-bold shadow-xs">系主任</span>
+              <span class="mt-0.5 bg-slate-800 text-amber-300 border border-amber-300/40 text-[8px] sm:text-[9px] px-1.5 py-0.2 rounded-full font-bold shadow-xs">系主任</span>
             </div>
           </div>
 
         </div>
       </div>
 
-      <!-- 右側：學生考照成就排行榜 -->
-      <div class="lg:col-span-4 bg-white rounded-3xl p-5 border border-amber-100 shadow-sm flex flex-col gap-3">
+      <!-- 右側：學生考照成就排行榜（手機端緊湊設計） -->
+      <div class="lg:col-span-4 bg-white rounded-3xl p-4 sm:p-5 border border-amber-100 shadow-sm flex flex-col gap-3">
         <div class="flex items-center justify-between border-b border-amber-50 pb-2">
-          <h2 class="font-black text-sm text-slate-800 flex items-center space-x-1.5">
-            <span class="text-base">🏆</span>
+          <h2 class="font-black text-xs sm:text-sm text-slate-800 flex items-center space-x-1.5">
+            <span>🏆</span>
             <span>學生考照成就排行榜</span>
           </h2>
           <span class="text-[10px] text-slate-400">點擊查看個人履歷</span>
         </div>
 
-        <div id="team-roster-list" class="custom-scroll max-h-[480px] overflow-y-auto space-y-2 pr-1"></div>
+        <div id="team-roster-list" class="custom-scroll max-h-[380px] sm:max-h-[460px] overflow-y-auto space-y-2 pr-1"></div>
       </div>
     </div>
   </main>
 
-  <!-- 學生登山履歷手冊 Modal -->
-  <div id="student-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-amber-100 overflow-hidden">
-      <div class="p-5 border-b border-amber-100 flex items-center justify-between bg-amber-50/50">
+  <!-- 學生登山履歷手冊 Modal（手機端置底防溢出彈窗） -->
+  <div id="student-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl border border-amber-100 overflow-hidden max-h-[85vh] flex flex-col">
+      <div class="p-4 sm:p-5 border-b border-amber-100 flex items-center justify-between bg-amber-50/50 shrink-0">
         <div class="flex items-center space-x-3">
-          <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-2xl font-black shadow-inner">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl sm:text-2xl font-black shadow-inner">
             🧗
           </div>
           <div>
             <div class="flex items-center space-x-2">
-              <h3 id="modal-student-name" class="font-black text-lg text-slate-800">學生姓名</h3>
-              <span id="modal-student-grade" class="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">112級</span>
+              <h3 id="modal-student-name" class="font-black text-base sm:text-lg text-slate-800">學生姓名</h3>
+              <span id="modal-student-grade" class="px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] sm:text-xs font-bold rounded-full">112級</span>
             </div>
-            <p id="modal-student-id" class="text-xs text-slate-400 mt-0.5">學號：未設定</p>
+            <p id="modal-student-id" class="text-[10px] sm:text-xs text-slate-400 mt-0.5">學號：未設定</p>
           </div>
         </div>
         <button onclick="closeStudentModal()" class="w-8 h-8 rounded-full hover:bg-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-700 transition">✕</button>
       </div>
 
-      <div class="p-5 space-y-4">
-        <div class="grid grid-cols-2 gap-3 bg-amber-50/30 p-3 rounded-2xl border border-amber-100/60 text-center">
+      <div class="p-4 sm:p-5 space-y-4 overflow-y-auto custom-scroll">
+        <div class="grid grid-cols-2 gap-2 sm:gap-3 bg-amber-50/30 p-3 rounded-2xl border border-amber-100/60 text-center">
           <div>
-            <span class="text-[11px] font-bold text-slate-400">當前攀登海拔</span>
-            <p id="modal-student-altitude" class="text-2xl font-black text-blue-600 mt-0.5">0 m</p>
+            <span class="text-[10px] sm:text-[11px] font-bold text-slate-400">當前攀登海拔</span>
+            <p id="modal-student-altitude" class="text-xl sm:text-2xl font-black text-blue-600 mt-0.5">0 m</p>
           </div>
           <div>
-            <span class="text-[11px] font-bold text-slate-400">累計考取證照</span>
-            <p id="modal-student-count" class="text-2xl font-black text-emerald-600 mt-0.5">0 張</p>
+            <span class="text-[10px] sm:text-[11px] font-bold text-slate-400">累計考取證照</span>
+            <p id="modal-student-count" class="text-xl sm:text-2xl font-black text-emerald-600 mt-0.5">0 張</p>
           </div>
         </div>
 
         <div>
-          <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center space-x-1">
+          <h4 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center space-x-1">
             <i data-lucide="award" class="w-3.5 h-3.5 text-amber-500"></i>
             <span>已考取之證照紀錄</span>
           </h4>
-          <div id="modal-student-certs" class="custom-scroll max-h-56 overflow-y-auto space-y-1.5 pr-1 text-xs"></div>
+          <div id="modal-student-certs" class="space-y-1.5 text-xs"></div>
         </div>
       </div>
 
-      <div class="p-4 bg-slate-50 border-t border-slate-100 text-right">
-        <button onclick="closeStudentModal()" class="px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-700 transition">關閉手冊</button>
+      <div class="p-3 sm:p-4 bg-slate-50 border-t border-slate-100 text-right shrink-0">
+        <button onclick="closeStudentModal()" class="w-full sm:w-auto px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-700 transition">關閉手冊</button>
       </div>
     </div>
   </div>
 
   <script>
-    // 你的專屬 Google Apps Script API 網址
     const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyUJjAYpBxqx7CJHAEil7-BJtnU_4D9R0MS0Cli6SeNDxLeBp60PZ-L_nCii1breC22bQ/exec";
 
-    // 證照庫定義
     const CERT_DATABASE = [
       { id: 'c1', name: '金融市場常識與職業道德', meters: 200 },
       { id: 'c2', name: 'TBSA商務企劃初階', meters: 200 },
@@ -353,7 +344,6 @@
       return Math.min(3952, total);
     }
 
-    // 內建基礎名冊 (開網頁瞬間顯示，隨後會被 Google 試算表即時連動覆蓋)
     let ALL_STUDENTS = [
       { id: "112175123", name: "葉清", grade: "112級", certs: [
         { name: "金融市場常識與職業道德", date: "2024/11/06" }, { name: "信託業務人員", date: "2026/01/17" },
@@ -367,23 +357,6 @@
         { name: "外匯人員專業能力測驗", date: "2025/07/31" }, { name: "理財規劃人員專業能力測驗", date: "2026/04/12" },
         { name: "衍生性金融商品銷售人員資格測驗", date: "2026/01/06" }, { name: "人身保險業務員銷售外幣收付非投資型保險商品", date: "2025/03/23" },
         { name: "永續發展基礎能力測驗", date: "2025/04/13" }, { name: "投信投顧業務員", date: "2026/02/26" }
-      ]},
-      { id: "111175116", name: "陳銘浩", grade: "111級", certs: [
-        { name: "金融市場常識與職業道德", date: "2022/10/21" }, { name: "信託業務人員", date: "2023/05/28" },
-        { name: "證券商業務人員", date: "2022/08/22" }, { name: "期貨商業務員", date: "2022/10/23" },
-        { name: "投信投顧業務員", date: "2023/07/31" }, { name: "衍生性金融商品銷售人員資格測驗", date: "2024/09/18" },
-        { name: "永續發展基礎能力測驗", date: "2024/12/01" }
-      ]},
-      { id: "113175112", name: "薛祺", grade: "113級", certs: [
-        { name: "金融市場常識與職業道德", date: "2024/10/19" }, { name: "信託業務人員", date: "2026/06/30" },
-        { name: "人身保險業務員", date: "2024/12/14" }, { name: "財產保險業務員", date: "2025/11/08" },
-        { name: "理財規劃人員專業能力測驗", date: "2026/10/02" }, { name: "TBSA商務企劃初階", date: "2026/06/02" },
-        { name: "生成式AI", date: "2025/12/13" }
-      ]},
-      { id: "114175001", name: "陳家佩", grade: "114級", certs: [
-        { name: "金融市場常識與職業道德", date: "2025/04/19" }, { name: "信託業務人員", date: "2026/04/11" },
-        { name: "銀行內控與內稽", date: "2026/03/14" }, { name: "證券商業務人員", date: "2025/08/03" },
-        { name: "人身保險業務員", date: "2026/07/02" }, { name: "財產保險業務員", date: "2026/07/17" }
       ]}
     ];
 
@@ -408,13 +381,11 @@
       "山頂的風景最美，大家衝刺呀！"
     ];
 
-    // ================= 1. 自動從 Google 試算表連動即時資料 =================
     async function fetchLiveDataFromGoogleSheet(isManual = false) {
       const syncBadge = document.getElementById('sync-status');
       try {
-        if (isManual) {
-          syncBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-spin"></span><span>同步中...</span>`;
-          syncBadge.className = 'flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[11px] font-bold';
+        if (isManual && syncBadge) {
+          syncBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-spin"></span><span>同步中</span>`;
         }
 
         const res = await fetch(GOOGLE_SHEET_API_URL);
@@ -425,18 +396,17 @@
           renderGradeSummaryCards();
           renderTeamView();
 
-          syncBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span>雲端連動成功 (${liveData.length}人)</span>`;
-          syncBadge.className = 'flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold';
+          if (syncBadge) {
+            syncBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span><span>已連動(${liveData.length}人)</span>`;
+            syncBadge.className = 'flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold';
+          }
           if (isManual) alert(`同步成功！已成功連動全系 ${liveData.length} 位同學最新紀錄！`);
         }
       } catch (err) {
         console.warn("連動試算表失敗，已採用快取資料顯示", err);
-        syncBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span><span>離線預覽模式</span>`;
-        syncBadge.className = 'flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-500 text-[11px] font-bold';
       }
     }
 
-    // ================= 2. 宜蘭礁溪即時天氣串接 =================
     async function fetchJiaoxiWeather() {
       try {
         const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=24.82&longitude=121.77&current_weather=true&daily=sunrise,sunset&timezone=Asia%2FTaipei');
@@ -454,22 +424,22 @@
     }
 
     function updateWeatherUI(temp, code, isDay) {
-      document.getElementById('weather-temp').innerText = `宜蘭礁溪 ${temp}°C`;
+      document.getElementById('weather-temp').innerText = `${temp}°C`;
       const descEl = document.getElementById('weather-desc');
       const iconEl = document.getElementById('weather-icon');
-      let desc = '天氣晴朗';
+      let desc = '晴朗';
       let icon = isDay ? '☀️' : '🌙';
 
       if (code >= 51 && code <= 67) {
-        desc = '飄雨連綿・登山口微雨';
+        desc = '飄雨';
         icon = '🌧️';
         showRainEffect(true);
       } else if (code >= 1 && code <= 3) {
-        desc = '多雲舒適・適合攀登';
+        desc = '多雲';
         icon = isDay ? '⛅' : '☁️';
         showRainEffect(false);
       } else if (code >= 80) {
-        desc = '陣雨綿綿';
+        desc = '陣雨';
         icon = '🌦️';
         showRainEffect(true);
       } else {
@@ -484,7 +454,7 @@
       rainLayer.innerHTML = '';
       if (enable) {
         rainLayer.classList.remove('hidden');
-        for (let i = 0; i < 40; i++) {
+        for (let i = 0; i < 30; i++) {
           const drop = document.createElement('div');
           drop.className = 'rain-drop';
           drop.style.left = `${Math.random() * 100}%`;
@@ -505,7 +475,7 @@
       if (!isDay || hour < 5 || hour >= 18) {
         container.style.background = 'linear-gradient(to bottom, #1e293b 0%, #334155 45%, #475569 100%)';
         celestial.innerText = '🌙';
-        celestial.className = 'w-12 h-12 rounded-full bg-amber-100 shadow-[0_0_20px_rgba(254,243,199,0.7)] flex items-center justify-center text-xl';
+        celestial.className = 'w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-amber-100 shadow-[0_0_20px_rgba(254,243,199,0.7)] flex items-center justify-center text-lg sm:text-2xl';
       } else if (hour >= 16 && hour < 18) {
         container.style.background = 'linear-gradient(to bottom, #fdba74 0%, #fed7aa 40%, #e0e7ff 100%)';
         celestial.innerText = '🌇';
@@ -522,24 +492,24 @@
       container.style.background = 'linear-gradient(to bottom, #7dd3fc 0%, #bae6fd 45%, #ecfccb 100%)';
     }
 
-    // ================= 3. 系主任巡山 NPC (14 秒移動一次) =================
     function startDirectorPatrol() {
       const director = document.getElementById('director-npc');
       const quoteEl = document.getElementById('director-quote');
 
+      // 使用百分比定位，防止手機螢幕尺寸變化時跑出畫面外
       const waypoints = [
-        { x: 250, y: 505 },
-        { x: 370, y: 445 },
-        { x: 300, y: 325 },
-        { x: 480, y: 220 },
-        { x: 420, y: 95 }
+        { x: 32, y: 94 },
+        { x: 46, y: 82 },
+        { x: 38, y: 60 },
+        { x: 60, y: 42 },
+        { x: 52, y: 19 }
       ];
 
       setInterval(() => {
         const target = waypoints[Math.floor(Math.random() * waypoints.length)];
-        const jitterX = (Math.random() * 30) - 15;
-        director.style.left = `${target.x + jitterX}px`;
-        director.style.top = `${target.y}px`;
+        const jitterX = (Math.random() * 4) - 2;
+        director.style.left = `${target.x + jitterX}%`;
+        director.style.top = `${target.y}%`;
 
         const randomQuote = DIRECTOR_QUOTES[Math.floor(Math.random() * DIRECTOR_QUOTES.length)];
         quoteEl.innerText = randomQuote;
@@ -551,11 +521,10 @@
       };
     }
 
-    // ================= 4. 純立體手繪公仔人物 SVG 生成 =================
     function createFigureSVG(genderType, shirtColor) {
       if (genderType === 'female') {
         return `
-          <svg width="28" height="46" viewBox="0 0 36 58" class="char-figure drop-shadow-md">
+          <svg width="22" height="38" viewBox="0 0 36 58" class="char-figure drop-shadow-md sm:w-[26px] sm:h-[44px]">
             <path d="M 10,16 C 6,10 8,3 18,3 C 28,3 30,10 26,16 C 29,20 28,30 25,32 C 22,25 24,18 24,18 C 22,19 14,19 12,18 C 12,18 14,25 11,32 C 8,30 7,20 10,16 Z" fill="#18181b"/>
             <circle cx="18" cy="17" r="10" fill="#fed7aa"/>
             <ellipse cx="12" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
@@ -574,7 +543,7 @@
         `;
       } else {
         return `
-          <svg width="28" height="48" viewBox="0 0 36 60" class="char-figure drop-shadow-md">
+          <svg width="22" height="40" viewBox="0 0 36 60" class="char-figure drop-shadow-md sm:w-[26px] sm:h-[46px]">
             <path d="M 10,14 C 7,11 8,5 13,4 C 15,1 21,1 24,3 C 28,1 33,5 31,10 C 34,12 34,17 29,19 C 25,20 12,20 10,14 Z" fill="#18181b"/>
             <circle cx="20" cy="16" r="10.5" fill="#fbd5b5"/>
             <ellipse cx="13" cy="18" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
@@ -594,7 +563,6 @@
       }
     }
 
-    // ================= 5. 年級統計卡與大隊名冊渲染 =================
     function renderGradeSummaryCards() {
       const container = document.getElementById('grade-summary-cards');
       container.innerHTML = '';
@@ -608,7 +576,7 @@
         const isCurrent = selectedGrade === g;
 
         const card = document.createElement('div');
-        card.className = `p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+        card.className = `p-2.5 sm:p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between shrink-0 w-28 sm:w-auto ${
           isCurrent 
             ? 'bg-amber-500 text-white shadow-md border-amber-500 ring-2 ring-amber-300' 
             : 'bg-white text-slate-700 border-amber-100 hover:border-amber-300 hover:bg-amber-50/40'
@@ -617,17 +585,17 @@
 
         card.innerHTML = `
           <div>
-            <div class="flex items-center justify-between mb-1">
-              <span class="font-black text-sm">${g === 'ALL' ? '🌟 全系總覽' : g}</span>
-              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${isCurrent ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800'}">
-                ${total} 人
+            <div class="flex items-center justify-between mb-0.5 sm:mb-1">
+              <span class="font-black text-xs sm:text-sm truncate">${g === 'ALL' ? '🌟全系' : g}</span>
+              <span class="text-[9px] font-bold px-1 py-0.2 rounded ${isCurrent ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800'}">
+                ${total}
               </span>
             </div>
-            <p class="text-[11px] ${isCurrent ? 'text-amber-100' : 'text-slate-500'}">已考取: <b class="${isCurrent ? 'text-white' : 'text-slate-800'}">${certified} 人</b></p>
+            <p class="text-[9px] sm:text-[11px] ${isCurrent ? 'text-amber-100' : 'text-slate-500'}">已考: <b>${certified}人</b></p>
           </div>
-          <div class="mt-2 pt-2 border-t ${isCurrent ? 'border-white/20' : 'border-amber-50'} flex items-baseline justify-between text-[11px]">
+          <div class="mt-1.5 pt-1.5 border-t ${isCurrent ? 'border-white/20' : 'border-amber-50'} flex items-baseline justify-between text-[10px] sm:text-[11px]">
             <span class="${isCurrent ? 'text-amber-100' : 'text-slate-400'}">總張數</span>
-            <span class="font-black text-sm">${totalCerts} <span class="text-[10px] font-normal">張</span></span>
+            <span class="font-black text-xs sm:text-sm">${totalCerts}</span>
           </div>
         `;
         container.appendChild(card);
@@ -655,7 +623,7 @@
       const certifiedStudents = list.filter(s => s.certs && s.certs.length > 0).length;
       const totalCerts = list.reduce((sum, s) => sum + (s.certs ? s.certs.length : 0), 0);
 
-      document.getElementById('current-filter-title').innerText = selectedGrade === 'ALL' ? '全體學生考照動態' : `${selectedGrade} 考照動態`;
+      document.getElementById('current-filter-title').innerText = selectedGrade === 'ALL' ? '全體學生' : selectedGrade;
       document.getElementById('stat-total-students').innerText = totalStudents;
       document.getElementById('stat-certified-students').innerText = certifiedStudents;
       document.getElementById('stat-total-certs').innerText = totalCerts;
@@ -664,6 +632,7 @@
       renderTeamRoster(list);
     }
 
+    // 核心優化：使用百分比 (%) 定位人物，手機畫面縮小時絕不被遮擋
     function renderTeamPins(list) {
       const layer = document.getElementById('team-pins-layer');
       layer.innerHTML = '';
@@ -673,10 +642,13 @@
         const altitude = calculateStudentAltitude(st.certs);
         const ratio = altitude / 3952;
         
-        const jitter = ((st.name.charCodeAt(0) * 19) % 70) - 35;
-        const topY = 510 - ratio * (510 - 95);
-        const baseX = 415 + Math.sin(ratio * Math.PI * 2.3) * 150;
-        const leftX = Math.max(70, Math.min(730, baseX + jitter));
+        // 縱向高度百分比 (從底部 95% 到峰頂 16%)
+        const topPercent = 95 - ratio * (95 - 16);
+        
+        // 橫向 S 型盤旋路徑百分比 (35% ~ 65% 之間)
+        const jitterPercent = ((st.name.charCodeAt(0) * 17) % 10) - 5;
+        const basePercent = 52 + Math.sin(ratio * Math.PI * 2.3) * 18;
+        const leftPercent = Math.max(12, Math.min(88, basePercent + jitterPercent));
 
         const conf = GRADE_COLORS[st.grade] || { badge: 'bg-slate-700', shirt: '#64748b' };
         const isFemale = (st.name.charCodeAt(st.name.length - 1) % 2 === 0);
@@ -684,13 +656,13 @@
 
         const pin = document.createElement('div');
         pin.className = 'absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-full hover:scale-130 transition-transform duration-200 z-10 select-none';
-        pin.style.left = `${leftX}px`;
-        pin.style.top = `${topY}px`;
+        pin.style.left = `${leftPercent}%`;
+        pin.style.top = `${topPercent}%`;
         pin.onclick = () => openStudentModal(st);
 
         pin.innerHTML = `
           <div class="flex flex-col items-center">
-            <div class="px-1.5 py-0.2 rounded-full text-[9px] font-black text-white shadow-xs whitespace-nowrap mb-0.5 ${conf.badge}">
+            <div class="px-1 py-0.2 rounded-full text-[8px] sm:text-[9px] font-black text-white shadow-xs whitespace-nowrap mb-0.5 ${conf.badge}">
               ${st.name} ${certCount > 0 ? `(${certCount})` : ''}
             </div>
             ${figureHtml}
@@ -712,7 +684,7 @@
       });
 
       if (list.length === 0) {
-        container.innerHTML = `<div class="p-8 text-center text-xs text-slate-400">查無學生資料</div>`;
+        container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400">查無學生資料</div>`;
         return;
       }
 
@@ -723,31 +695,31 @@
         const conf = GRADE_COLORS[st.grade] || { bg: 'bg-slate-100', text: 'text-slate-600' };
 
         const card = document.createElement('div');
-        card.className = 'p-3 bg-amber-50/30 border border-amber-100 rounded-2xl hover:bg-amber-100/40 hover:border-amber-300 transition cursor-pointer flex flex-col gap-2';
+        card.className = 'p-2.5 sm:p-3 bg-amber-50/30 border border-amber-100 rounded-2xl hover:bg-amber-100/40 hover:border-amber-300 transition cursor-pointer flex flex-col gap-1.5 sm:gap-2';
         card.onclick = () => openStudentModal(st);
 
         card.innerHTML = `
           <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2.5 min-w-0">
-              <span class="w-5 text-center text-xs font-black ${idx < 3 ? 'text-amber-500 font-black' : 'text-slate-400'}">${idx + 1}</span>
+            <div class="flex items-center space-x-2 min-w-0">
+              <span class="w-4 text-center text-xs font-black ${idx < 3 ? 'text-amber-500' : 'text-slate-400'}">${idx + 1}</span>
               <div class="truncate">
                 <p class="text-xs font-bold text-slate-800 truncate">
                   ${st.name} 
-                  <span class="text-[10px] font-bold px-1.5 py-0.2 rounded-full ${conf.bg} ${conf.text} ml-1">${st.grade}</span>
+                  <span class="text-[9px] font-bold px-1 py-0.2 rounded-full ${conf.bg} ${conf.text} ml-0.5">${st.grade}</span>
                 </p>
-                <p class="text-[10px] text-slate-400">學號: ${st.id || '未登記'}</p>
+                <p class="text-[9px] text-slate-400">學號: ${st.id || '未登記'}</p>
               </div>
             </div>
-            <div class="text-right">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${
+            <div class="text-right shrink-0">
+              <span class="px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold ${
                 certCount >= 5 ? 'bg-emerald-100 text-emerald-800' : certCount > 0 ? 'bg-blue-100 text-blue-800' : 'bg-slate-200 text-slate-600'
               }">
                 ${certCount} 張
               </span>
-              <p class="text-[10px] text-amber-600 font-bold mt-0.5">${alt.toLocaleString()} m</p>
+              <p class="text-[9px] sm:text-[10px] text-amber-600 font-bold mt-0.5">${alt.toLocaleString()} m</p>
             </div>
           </div>
-          <div class="w-full bg-slate-200/80 h-1.5 rounded-full overflow-hidden">
+          <div class="w-full bg-slate-200/80 h-1 sm:h-1.5 rounded-full overflow-hidden">
             <div class="bg-gradient-to-r from-amber-400 to-emerald-500 h-full rounded-full" style="width: ${pct}%"></div>
           </div>
         `;
@@ -755,7 +727,6 @@
       });
     }
 
-    // Modal
     function openStudentModal(student) {
       const modal = document.getElementById('student-modal');
       const certCount = student.certs ? student.certs.length : 0;
@@ -771,18 +742,18 @@
       certsContainer.innerHTML = '';
 
       if (certCount === 0) {
-        certsContainer.innerHTML = `<div class="p-6 text-center text-slate-400 bg-slate-50 rounded-xl">尚無考取紀錄，在登山口整裝待發！</div>`;
+        certsContainer.innerHTML = `<div class="p-5 text-center text-slate-400 bg-slate-50 rounded-xl text-xs">尚無考取紀錄，在登山口整裝待發！</div>`;
       } else {
         student.certs.forEach(c => {
           const meters = getCertPoints(c.name);
           const item = document.createElement('div');
-          item.className = 'p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center justify-between';
+          item.className = 'p-2 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center justify-between';
           item.innerHTML = `
             <div class="min-w-0 pr-2">
-              <p class="font-bold text-slate-700 truncate">${c.name}</p>
-              <p class="text-[10px] text-slate-400">考取日期：${c.date || '無紀錄'}</p>
+              <p class="font-bold text-slate-700 truncate text-xs">${c.name}</p>
+              <p class="text-[9px] text-slate-400">考取日期：${c.date || '無紀錄'}</p>
             </div>
-            <span class="px-2 py-0.5 bg-amber-50 text-amber-700 font-black rounded-lg text-[10px] whitespace-nowrap">+${meters} m</span>
+            <span class="px-1.5 py-0.5 bg-amber-50 text-amber-700 font-black rounded-lg text-[9px] whitespace-nowrap">+${meters}m</span>
           `;
           certsContainer.appendChild(item);
         });
@@ -796,15 +767,12 @@
       document.getElementById('student-modal').classList.add('hidden');
     }
 
-    // 頁面初始化
     window.addEventListener('DOMContentLoaded', () => {
       renderGradeSummaryCards();
       renderTeamView();
       fetchJiaoxiWeather();
       startDirectorPatrol();
       lucide.createIcons();
-      
-      // 自動連動 Google 試算表最新證照名冊
       fetchLiveDataFromGoogleSheet();
     });
   </script>
