@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>經濟證照登山全景・FGU DAE</title>
+  <title>經濟百岳全景群島生態・FGU DAE</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
@@ -17,7 +17,7 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* 浮島微懸浮呼吸動態 */
+    /* 浮島微懸浮動態 */
     @keyframes islandFloat {
       0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(-5px); }
@@ -26,7 +26,7 @@
       animation: islandFloat 7s ease-in-out infinite;
     }
 
-    /* 熱氣球巡弋動畫 (四島之間緩慢漂浮) */
+    /* 熱氣球巡弋動畫 */
     @keyframes balloonCruise {
       0% { transform: translate(660px, 400px) translateY(0); }
       25% { transform: translate(320px, 220px) translateY(-8px); }
@@ -38,7 +38,7 @@
       animation: balloonCruise 48s ease-in-out infinite;
     }
 
-    /* 營火閃爍微光 */
+    /* 營火微光閃爍 */
     @keyframes campfireFlicker {
       0%, 100% { transform: scale(1); opacity: 0.9; }
       50% { transform: scale(1.15); opacity: 1; filter: drop-shadow(0 0 8px rgba(249,115,22,0.8)); }
@@ -65,7 +65,6 @@
       animation: walkBounce 2.5s ease-in-out infinite;
     }
 
-    /* 畫布視口抓取狀態 */
     .viewport-grab { cursor: grab; }
     .viewport-grabbing { cursor: grabbing; user-select: none; }
   </style>
@@ -84,7 +83,7 @@
             經濟百岳群島大平原
             <span class="text-[9px] sm:text-xs font-bold px-2 py-0.5 bg-[#e3ecd7] text-[#4d6a42] rounded-full shrink-0">全島同屏航海版</span>
           </h1>
-          <p class="text-[10px] sm:text-xs text-[#8c8275] truncate">佛光大學應用經濟學系・等角全景微縮</p>
+          <p class="text-[10px] sm:text-xs text-[#8c8275] truncate">佛光大學應用經濟學系・等角全景微縮生態</p>
         </div>
       </div>
 
@@ -128,7 +127,7 @@
       </button>
     </div>
 
-    <!-- 年級快速切換狀態卡片列 (主要切換百岳主島名單) -->
+    <!-- 年級卡片列 -->
     <div class="flex overflow-x-auto no-scrollbar gap-2.5 sm:grid sm:grid-cols-3 lg:grid-cols-6 pb-1" id="grade-summary-cards"></div>
 
     <!-- 控制列：統計摘要與搜尋 -->
@@ -139,7 +138,7 @@
           <span>・考取 <b id="stat-certified-students" class="text-[#4b7a42]">0</b> 人</span>
           <span>・總張數 <b id="stat-total-certs" class="text-[#b46b2b]">0</b> 張</span>
           <span>・備戰中 <b id="stat-training-count" class="text-amber-600">0</b> 人</span>
-          <span>・實戰體驗 <b id="stat-trial-count" class="text-blue-600">0</b> 人</span>
+          <span>・職場體驗 <b id="stat-trial-count" class="text-blue-600">0</b> 人</span>
         </div>
       </div>
 
@@ -148,7 +147,7 @@
           <input type="text" id="team-search-input" oninput="renderAllLayers()" placeholder="搜尋學生姓名或學號..." class="w-full pl-8 pr-3 py-1.5 bg-[#f4ece1] border border-[#e0d2c0] rounded-xl text-xs outline-none focus:bg-white focus:ring-2 focus:ring-[#8fa878]">
           <i data-lucide="search" class="w-3.5 h-3.5 text-[#9e9080] absolute left-2.5 top-2.5"></i>
         </div>
-        <button onclick="fetchLiveDataFromGoogleSheet(true)" title="重新整理" class="p-2 bg-[#f4ece1] hover:bg-[#ede1d2] text-[#6d5b45] border border-[#e0d2c0] rounded-xl transition flex items-center justify-center shrink-0">
+        <button onclick="fetchLiveDataFromGoogleSheet(true)" title="重新整理試算表" class="p-2 bg-[#f4ece1] hover:bg-[#ede1d2] text-[#6d5b45] border border-[#e0d2c0] rounded-xl transition flex items-center justify-center shrink-0">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
         </button>
       </div>
@@ -157,12 +156,12 @@
     <!-- 雙欄架構：左側群島大平原全景畫布、右側名冊清單 -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
       
-      <!-- 左側：方案 A 群島等角大平原全景畫布 (可縮放與拖曳) -->
+      <!-- 左側：方案 A 群島等角大平原全景畫布 (1400 x 800) -->
       <div class="lg:col-span-8 bg-[#fbf7f0] rounded-3xl p-3 sm:p-5 border border-[#e8dccb] shadow-xs flex flex-col">
         <div class="flex items-center justify-between mb-2">
           <div class="flex items-center space-x-2">
             <span class="text-base">🗺️</span>
-            <h2 class="font-black text-xs sm:text-sm text-[#3d4a39]">群島全景大平原（可按住滑鼠或雙指拖曳平移、滾輪縮放）</h2>
+            <h2 class="font-black text-xs sm:text-sm text-[#3d4a39]">群島全景大平原（滑鼠滾輪/雙指縮放，拖曳平移）</h2>
           </div>
           <span class="text-[10px] text-amber-800 font-bold bg-amber-100/80 px-2 py-0.5 rounded-full cursor-pointer hover:bg-amber-200" onclick="triggerBalloonViewSwitch()">
             🎈 點擊熱氣球巡弋跳轉
@@ -184,7 +183,6 @@
           <!-- 可縮放與拖曳的群島大平原容器層 (1400 x 800) -->
           <div id="island-pan-zoom-stage" class="absolute left-0 top-0 w-[1400px] h-[800px] origin-top-left transition-transform duration-300 ease-out select-none">
             
-            <!-- 大平原底層 SVG (包含四大島嶼、群島吊橋索道與地標) -->
             <svg class="w-full h-full" viewBox="0 0 1400 800" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="mainGrass" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -198,36 +196,26 @@
                 </linearGradient>
               </defs>
 
-              <!-- 群島連接吊橋與浮空索道 (穿透島嶼之間) -->
-              <!-- 1. 主島 ↔ 左上備考練功島索道吊橋 -->
+              <!-- 群島連接吊橋與浮空索道 -->
               <path d="M 460,400 Q 380,340 330,280" fill="none" stroke="#b09e88" stroke-width="6" stroke-dasharray="8,5" stroke-linecap="round"/>
               <line x1="460" y1="400" x2="330" y2="280" stroke="#7d6b56" stroke-width="2" stroke-dasharray="3,3"/>
 
-              <!-- 2. 主島 ↔ 右上實戰試煉島索道吊橋 -->
               <path d="M 940,390 Q 1010,320 1060,260" fill="none" stroke="#b09e88" stroke-width="6" stroke-dasharray="8,5" stroke-linecap="round"/>
               <line x1="940" y1="390" x2="1060" y2="260" stroke="#7d6b56" stroke-width="2" stroke-dasharray="3,3"/>
 
-              <!-- 3. 主島 ↔ 右下燈塔浮空港棧道 -->
               <path d="M 920,490 Q 1030,520 1130,560" fill="none" stroke="#d5be9b" stroke-width="8" stroke-linecap="round"/>
 
-              <!-- ================= 1. 中央：玉山百岳島 (佔約 50%，成就登頂主島) ================= -->
+              <!-- 1. 中央：玉山百岳島 -->
               <g class="island-float" id="svg-main-island">
-                <!-- 投影 -->
                 <ellipse cx="700" cy="580" rx="270" ry="24" fill="#4d3b2b" opacity="0.25"/>
-                <!-- 厚實地層底座 -->
                 <path d="M 450,420 Q 480,545 700,560 Q 920,545 950,420 C 900,470 780,495 700,495 C 620,495 500,470 450,420 Z" fill="url(#earthGrad)"/>
-                <!-- 綠草坪台地 -->
                 <ellipse cx="700" cy="425" rx="255" ry="75" fill="url(#mainGrass)"/>
-                <!-- 山岳山體 -->
                 <path d="M 530,410 C 560,320 610,240 645,240 C 675,240 710,310 730,410 Z" fill="#587f4c" opacity="0.8"/>
                 <path d="M 670,410 C 710,300 760,220 800,220 C 830,220 870,300 900,410 Z" fill="#537b46" opacity="0.75"/>
                 <path d="M 510,420 C 590,320 650,150 695,95 C 705,85 715,85 725,95 C 770,150 830,320 910,420 Z" fill="#4d7240"/>
                 <path d="M 695,95 C 715,85 725,95 740,150 C 770,230 800,320 835,420 C 775,430 710,430 680,420 C 665,330 680,210 695,95 Z" fill="#669152" opacity="0.7"/>
-                <!-- 白雪山帽 -->
                 <path d="M 670,135 C 685,110 695,90 710,90 C 725,90 735,110 750,135 C 740,150 730,145 720,160 C 710,150 695,155 685,165 C 680,150 675,155 670,135 Z" fill="url(#snowGrad)"/>
-                <!-- 盤山石階 -->
                 <path d="M 560,445 Q 660,410 780,395 T 620,295 T 780,210 T 710,110" fill="none" stroke="#e8ded0" stroke-width="8" stroke-dasharray="10,6" stroke-linecap="round"/>
-                <!-- 營地標註線 -->
                 <line x1="480" y1="110" x2="920" y2="110" stroke="#e16161" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.5"/>
                 <text x="495" y="105" font-size="11" font-weight="900" fill="#c53b3b">🚩 玉山主峰頂 (3,952m)</text>
                 <line x1="480" y1="210" x2="920" y2="210" stroke="#d97736" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.5"/>
@@ -238,85 +226,70 @@
                 <text x="495" y="390" font-size="10" font-weight="bold" fill="#325e28">🛖 孟祿亭 (1,800m)</text>
               </g>
 
-              <!-- ================= 2. 左上角：備考練功島 (道館營火・竹林) ================= -->
+              <!-- 2. 左上角：備考練功島 -->
               <g class="island-float" id="svg-training-island" style="animation-delay: -2s;">
                 <ellipse cx="260" cy="305" rx="160" ry="15" fill="#4d3b2b" opacity="0.2"/>
                 <path d="M 120,230 Q 150,300 260,305 Q 370,300 400,230 C 360,265 290,280 260,280 C 230,280 160,265 120,230 Z" fill="#694d37"/>
                 <ellipse cx="260" cy="225" rx="145" ry="50" fill="#68935a"/>
-                <!-- 營地 1：金融/信託營火 -->
                 <circle cx="210" cy="210" r="10" fill="#4a3322"/>
                 <circle cx="210" cy="208" r="5" fill="#f97316" class="campfire-glow"/>
                 <text x="180" y="190" font-size="10" font-weight="900" fill="#26401f">⛺ 信託營火</text>
-                <!-- 營地 2：高業/期貨書閣 -->
                 <circle cx="310" cy="210" r="10" fill="#4a3322"/>
                 <circle cx="310" cy="208" r="5" fill="#f97316" class="campfire-glow"/>
                 <text x="280" y="190" font-size="10" font-weight="900" fill="#26401f">📜 證券書閣</text>
-                <!-- 營地 3：AI研習亭 -->
                 <circle cx="260" cy="245" r="10" fill="#4a3322"/>
                 <circle cx="260" cy="243" r="5" fill="#f97316" class="campfire-glow"/>
                 <text x="235" y="268" font-size="10" font-weight="900" fill="#26401f">🤖 AI研習亭</text>
-                <!-- 島名標誌牌 -->
                 <text x="210" y="150" font-size="12" font-weight="900" fill="#3f2e1f">🧘 備考練功島</text>
               </g>
 
-              <!-- ================= 3. 右上角：實戰試煉島 (銀行、證券、保險、期貨聚落) ================= -->
+              <!-- 3. 右上角：實戰試煉島 -->
               <g class="island-float" id="svg-trial-island" style="animation-delay: -4s;">
                 <ellipse cx="1120" cy="295" rx="170" ry="16" fill="#4d3b2b" opacity="0.2"/>
                 <path d="M 970,220 Q 1010,290 1120,295 Q 1230,290 1270,220 C 1230,255 1160,270 1120,270 C 1080,270 1010,255 970,220 Z" fill="#6f4a30"/>
                 <ellipse cx="1120" cy="220" rx="155" ry="52" fill="#759e66"/>
-                <!-- 銀行大理石行舍 -->
                 <rect x="1030" y="150" width="40" height="35" rx="2" fill="#3b536b"/>
                 <polygon points="1020,150 1050,130 1080,150" fill="#243444"/>
                 <text x="1033" y="172" font-size="8" font-weight="900" fill="#ffffff">🏦 銀行</text>
-                <!-- 證券行情大樓 -->
                 <rect x="1170" y="130" width="38" height="55" rx="2" fill="#2d4059"/>
                 <rect x="1175" y="140" width="28" height="8" fill="#ef4444"/>
                 <text x="1173" y="168" font-size="8" font-weight="900" fill="#ffffff">📈 證券</text>
-                <!-- 保險洋傘諮詢亭 -->
                 <path d="M 1045,210 Q 1060,195 1075,210 Z" fill="#d97706"/>
                 <line x1="1060" y1="210" x2="1060" y2="230" stroke="#78350f" stroke-width="2"/>
                 <text x="1042" y="242" font-size="8" font-weight="900" fill="#78350f">🛡️ 保險</text>
-                <!-- 期貨信號塔 -->
                 <line x1="1185" y1="195" x2="1185" y2="230" stroke="#be123c" stroke-width="2"/>
                 <circle cx="1185" cy="195" r="3" fill="#f43f5e"/>
                 <text x="1170" y="242" font-size="8" font-weight="900" fill="#881337">⚡ 期貨</text>
-                <!-- 島名標誌牌 -->
                 <text x="1070" y="115" font-size="12" font-weight="900" fill="#3f2e1f">⚔️ 實戰試煉島</text>
               </g>
 
-              <!-- ================= 4. 右下角：燈塔浮空港 (外語檢定・港灣) ================= -->
+              <!-- 4. 右下角：燈塔浮空港 -->
               <g class="island-float" id="svg-port-island" style="animation-delay: -1s;">
                 <ellipse cx="1180" cy="650" rx="140" ry="14" fill="#4d3b2b" opacity="0.2"/>
                 <path d="M 1060,580 Q 1090,645 1180,650 Q 1270,645 1300,580 C 1260,610 1210,625 1180,625 C 1150,625 1100,610 1060,580 Z" fill="#694d37"/>
                 <ellipse cx="1180" cy="580" rx="125" ry="45" fill="#6a9662"/>
-                <!-- 紅白相間燈塔 -->
                 <polygon points="1210,560 1230,560 1225,480 1215,480" fill="#ffffff"/>
                 <polygon points="1212,540 1228,540 1226,520 1214,520" fill="#ef4444"/>
                 <polygon points="1214,500 1226,500 1225,480 1215,480" fill="#ef4444"/>
                 <circle cx="1220" cy="475" r="7" fill="#fde047" opacity="0.85"/>
                 <text x="1145" y="520" font-size="12" font-weight="900" fill="#3f2e1f">🗼 燈塔浮空港</text>
-                <text x="1145" y="535" font-size="9" fill="#5c4a3b">多益/外語/啟航碼頭</text>
               </g>
             </svg>
 
-            <!-- 學生公仔與地標標籤圖層 (使用百分比精準對應 1400 x 800) -->
+            <!-- 學生公仔與地標標籤圖層 -->
             <div id="island-pins-layer" class="absolute inset-0 pointer-events-none z-20"></div>
 
-            <!-- 繫著「FGU DAE」三角旗的巡弋熱氣球 -->
+            <!-- 巡弋熱氣球 -->
             <div id="cruise-balloon" onclick="triggerBalloonViewSwitch()" class="absolute left-0 top-0 balloon-route pointer-events-auto cursor-pointer z-30 transition-transform duration-500 hover:scale-125" title="點擊熱氣球切換視角！">
               <div class="flex flex-col items-center">
-                <!-- FGU DAE 飄揚三角旗 -->
                 <div class="relative -top-1 bg-[#1e3a8a] text-amber-300 text-[8px] font-black px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">
                   🚩 FGU DAE
                   <div class="absolute -right-1 top-1 w-0 h-0 border-t-2 border-t-transparent border-b-2 border-b-transparent border-l-4 border-l-[#1e3a8a]"></div>
                 </div>
-                <!-- 經典熱氣球球體 (條紋繪本風) -->
                 <svg width="40" height="52" viewBox="0 0 50 65" class="drop-shadow-lg">
                   <path d="M 25,2 C 10,2 2,15 2,26 C 2,36 12,46 20,50 L 30,50 C 38,46 48,36 48,26 C 48,15 40,2 25,2 Z" fill="#f97316"/>
-                  <!-- 條紋彩繪 -->
                   <path d="M 25,2 C 18,2 14,15 14,26 C 14,36 18,46 22,50 L 28,50 C 32,46 36,36 36,26 C 36,15 32,2 25,2 Z" fill="#facc15"/>
                   <path d="M 25,2 C 22,2 20,15 20,26 C 20,36 22,46 23.5,50 L 26.5,50 C 28,46 30,36 30,26 C 30,15 28,2 25,2 Z" fill="#ffffff"/>
-                  <!-- 吊籃繩索與藤籃 -->
                   <line x1="21" y1="50" x2="21" y2="56" stroke="#451a03" stroke-width="1.5"/>
                   <line x1="29" y1="50" x2="29" y2="56" stroke="#451a03" stroke-width="1.5"/>
                   <rect x="19" y="56" width="12" height="8" rx="2" fill="#78350f"/>
@@ -324,7 +297,7 @@
               </div>
             </div>
 
-            <!-- 系主任跨島突襲巡視 NPC (搭乘索道慢步至各島) -->
+            <!-- 系主任巡島 NPC -->
             <div id="director-npc" class="absolute pointer-events-auto cursor-pointer z-30" style="left: 700px; top: 380px; transform: translate(-50%, -100%); transition: left 5s ease-in-out, top 5s ease-in-out;">
               <div class="speech-bubble relative -top-1.5 bg-[#fcd472] text-[#3c2a13] text-[9px] sm:text-[11px] font-black px-2.5 sm:px-3 py-1 rounded-2xl shadow-md border border-white whitespace-nowrap">
                 <span id="director-quote">今天礁溪天氣不錯，大家多考一張！</span>
@@ -351,7 +324,6 @@
           </div>
         </div>
 
-        <!-- 畫布右下角控制按鈕 -->
         <div class="flex items-center justify-between text-[11px] text-[#8c8275] pt-2 px-1">
           <span>💡 提示：可用滑鼠滾輪/手勢自由縮放畫布，拖曳任意平移</span>
           <button onclick="resetStageTransform()" class="px-2.5 py-1 bg-[#ede1d2] hover:bg-[#e2d3c0] text-[#5e4b37] rounded-lg font-bold transition">
@@ -360,7 +332,7 @@
         </div>
       </div>
 
-      <!-- 右側：全系各島活動綜合動態排行榜 -->
+      <!-- 右側：全島名冊排行榜 -->
       <div class="lg:col-span-4 bg-[#fbf7f0] rounded-3xl p-4 sm:p-5 border border-[#e8dccb] shadow-xs flex flex-col gap-3">
         <div class="flex items-center justify-between border-b border-[#ebdcc7] pb-2">
           <h2 class="font-black text-xs sm:text-sm text-[#3d4a39] flex items-center space-x-1.5">
@@ -379,7 +351,7 @@
     </div>
   </main>
 
-  <!-- 學生手冊 Modal -->
+  <!-- 彈窗 Modal -->
   <div id="student-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-[#fbf7f0] w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#decbb7] overflow-hidden max-h-[85vh] flex flex-col">
       <div class="p-4 sm:p-5 border-b border-[#ebdcc7] flex items-center justify-between bg-[#f4ece1] shrink-0">
@@ -409,7 +381,62 @@
   <script>
     const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyUJjAYpBxqx7CJHAEil7-BJtnU_4D9R0MS0Cli6SeNDxLeBp60PZ-L_nCii1breC22bQ/exec";
 
-    // 證照庫定義
+    // 核心公仔繪製函式（修復頭髮！加上齊肩短髮/瀏海與立體五官）
+    function createFigureSVG(genderType, shirtColor) {
+      if (genderType === 'female') {
+        // 女生版：黑色齊肩短髮、整齊妹妹頭瀏海、粉嫩雙頰、上衣與雙腿
+        return `
+          <svg width="24" height="42" viewBox="0 0 36 60" class="char-figure drop-shadow-md">
+            <!-- 齊肩黑髮外廓 -->
+            <path d="M 8,16 C 5,10 7,2 18,2 C 29,2 31,10 28,16 C 30,22 29,30 27,33 C 24,26 25,18 25,18 C 22,20 14,20 11,18 C 11,18 12,26 9,33 C 7,30 6,22 8,16 Z" fill="#18181b"/>
+            <!-- 臉蛋 -->
+            <circle cx="18" cy="17" r="10" fill="#fed7aa"/>
+            <!-- 額頭黑髮瀏海 -->
+            <path d="M 9,15 Q 18,18 27,15 Q 18,11 9,15 Z" fill="#18181b"/>
+            <!-- 腮紅 -->
+            <ellipse cx="12" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
+            <ellipse cx="24" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
+            <!-- 笑眼與嘴巴 -->
+            <circle cx="14" cy="16" r="1.5" fill="#18181b"/>
+            <circle cx="22" cy="16" r="1.5" fill="#18181b"/>
+            <path d="M 16,21 Q 18,23 20,21" fill="none" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- 上衣 -->
+            <rect x="11" y="27" width="14" height="16" rx="3.5" fill="${shirtColor}"/>
+            <!-- 雙腿與鞋子 -->
+            <rect x="12" y="43" width="5" height="12" rx="1" fill="#1e293b"/>
+            <rect x="19" y="43" width="5" height="12" rx="1" fill="#1e293b"/>
+            <rect x="11.5" y="55" width="6" height="3" rx="1" fill="#ffffff"/>
+            <rect x="18.5" y="55" width="6" height="3" rx="1" fill="#ffffff"/>
+          </svg>
+        `;
+      } else {
+        // 男生版：帥氣微捲短黑髮、單眼皮笑眸、俐落穿搭
+        return `
+          <svg width="24" height="42" viewBox="0 0 36 60" class="char-figure drop-shadow-md">
+            <!-- 頂部黑髮 -->
+            <path d="M 9,14 C 6,10 7,3 13,3 C 15,1 21,1 23,3 C 28,1 32,5 30,10 C 33,12 33,17 29,19 C 25,20 12,20 9,14 Z" fill="#18181b"/>
+            <!-- 臉蛋 -->
+            <circle cx="18" cy="17" r="10.5" fill="#fbd5b5"/>
+            <!-- 腮紅 -->
+            <ellipse cx="12" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.7"/>
+            <ellipse cx="24" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.7"/>
+            <!-- 雙眼與親切笑嘴 -->
+            <circle cx="14" cy="16" r="1.5" fill="#18181b"/>
+            <circle cx="22" cy="16" r="1.5" fill="#18181b"/>
+            <path d="M 16,21 Q 18,23 20,21" fill="none" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- 上衣 -->
+            <rect x="11" y="27" width="14" height="16" rx="3.5" fill="${shirtColor}"/>
+            <!-- 褲子與鞋 -->
+            <rect x="12" y="43" width="5" height="12" rx="1" fill="#1e293b"/>
+            <rect x="19" y="43" width="5" height="12" rx="1" fill="#1e293b"/>
+            <rect x="11.5" y="55" width="6" height="3" rx="1" fill="#ffffff"/>
+            <rect x="18.5" y="55" width="6" height="3" rx="1" fill="#ffffff"/>
+          </svg>
+        `;
+      }
+    }
+
+    // 證照加分設定
     const CERT_DATABASE = [
       { id: 'c1', name: '金融市場常識與職業道德', meters: 200 },
       { id: 'c2', name: 'TBSA商務企劃初階', meters: 200 },
@@ -470,7 +497,7 @@
       return Math.min(3952, total);
     }
 
-    // 1. 考照主島名冊
+    // 1. 考照百岳名冊預設值
     let ALL_STUDENTS = [
       { id: "112175123", name: "葉清", grade: "112級", certs: [
         { name: "金融市場常識與職業道德", date: "2024/11/06" }, { name: "信託業務人員", date: "2026/01/17" },
@@ -504,18 +531,16 @@
       ]}
     ];
 
-    // 2. 備考練功島名冊 (含過期自動排除)
+    // 2. 練功登記預設值
     let TRAINING_STUDENTS = [
       { id: "112175101", name: "馬範懿", grade: "112級", targetCert: "投資型保險商品業務員", targetDate: "2026/11/20", location: "每週三下午在系圖書館研討室刷題，求夥伴！" },
       { id: "113175112", name: "薛祺", grade: "113級", targetCert: "期貨商業務員", targetDate: "2026/12/15", location: "正在讀期貨法規與選擇權策略，歡迎線下交流！" },
       { id: "112175123", name: "葉清", grade: "112級", targetCert: "多益 800分衝刺", targetDate: "2026/11/30", location: "每天晚上在自習室聽聽力，可一起組單字互考小隊。" },
       { id: "113175108", name: "林姵妡", grade: "113級", targetCert: "永續發展基礎能力測驗", targetDate: "2026/12/31", location: "ESG 碳盤查概念研讀中，每週二研究室見！" },
-      { id: "114175001", name: "陳家佩", grade: "114級", targetCert: "信託業務人員", targetDate: "2026/11/10", location: "剛起步讀法規，徵求信託考古題戰友！" },
-      // 示範過期資料（自動過濾）
-      { id: "111175116", name: "陳銘浩", grade: "111級", targetCert: "過期證照", targetDate: "2025/01/01", location: "過期自動隱藏" }
+      { id: "114175001", name: "陳家佩", grade: "114級", targetCert: "信託業務人員", targetDate: "2026/11/10", location: "剛起步讀法規，徵求信託考古題戰友！" }
     ];
 
-    // 3. 實戰試煉島名冊
+    // 3. 職場體驗預設值
     let TRIAL_STUDENTS = [
       { id: "111175103", name: "呂季生", grade: "111級", sector: "銀行", company: "台灣銀行 宜蘭分行", role: "理財專員實習生", quote: "把外匯與信託證照先考起來，在櫃台實習時能快速理解流程！" },
       { id: "111175116", name: "陳銘浩", grade: "111級", sector: "證券", company: "元大證券 羅東分公司", role: "證券研究助理", quote: "證券商高級業務員一定要好好準備，看盤與研讀產業報告很有成就感。" },
@@ -536,20 +561,15 @@
       '115級': { badge: 'bg-[#b86178]', shirt: '#c9788e', text: 'text-[#8f3f54]', bg: 'bg-[#f7e8ec]' }
     };
 
-    // 系主任跨島動態巡邏節點與各島打氣語錄
     const DIRECTOR_PATROL_WAYPOINTS = [
-      // 百岳主島
       { x: 700, y: 440, quote: "穩住呼吸，一步一腳印登上玉山主峰！" },
       { x: 710, y: 220, quote: "排雲山莊風光好，再考一張就攻頂！" },
-      // 備考練功島
       { x: 260, y: 230, quote: "練功島的同學別孤軍奮戰，大家聚在一起刷題！" },
-      // 實戰試煉島
       { x: 1060, y: 220, quote: "在銀行和證券職場實戰，內控與法規最重要！" },
-      // 燈塔港
       { x: 1180, y: 560, quote: "航向國際市場，多益考高分出海不用怕！" }
     ];
 
-    // ================= 1. 方案 A：平移與縮放（Pan & Zoom）引擎 =================
+    // 縮放與平移引擎
     let stageScale = 1;
     let stagePanX = 0;
     let stagePanY = 0;
@@ -564,7 +584,6 @@
     }
 
     function resetStageTransform() {
-      // 依螢幕自適應居中
       const vpWidth = viewport.clientWidth;
       const vpHeight = viewport.clientHeight;
       stageScale = Math.min(vpWidth / 1400, vpHeight / 800) * 1.1;
@@ -573,7 +592,6 @@
       applyStageTransform();
     }
 
-    // 滑鼠與手勢拖曳平移
     viewport.addEventListener('mousedown', (e) => {
       isDragging = true;
       startX = e.clientX - stagePanX;
@@ -595,24 +613,19 @@
       viewport.classList.add('viewport-grab');
     });
 
-    // 滑鼠滾輪縮放
     viewport.addEventListener('wheel', (e) => {
       e.preventDefault();
       const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
       const newScale = Math.max(0.4, Math.min(2.5, stageScale * zoomFactor));
-
-      // 以滑鼠位置為中心縮放
       const rect = viewport.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
-
       stagePanX = mouseX - (mouseX - stagePanX) * (newScale / stageScale);
       stagePanY = mouseY - (mouseY - stagePanY) * (newScale / stageScale);
       stageScale = newScale;
       applyStageTransform();
     }, { passive: false });
 
-    // 手指觸控支援 (平移)
     let touchStartX = 0, touchStartY = 0;
     viewport.addEventListener('touchstart', (e) => {
       if (e.touches.length === 1) {
@@ -629,12 +642,9 @@
       }
     });
 
-    // 鏡頭聚焦特定島嶼
     function focusIsland(islandKey) {
       const vpWidth = viewport.clientWidth;
       const vpHeight = viewport.clientHeight;
-
-      // 各島中心點 (X, Y in 1400x800)
       const targets = {
         overview: { x: 700, y: 400, scale: Math.min(vpWidth / 1400, vpHeight / 800) },
         main: { x: 700, y: 400, scale: 1.15 },
@@ -649,7 +659,6 @@
       stagePanY = (vpHeight / 2) - (t.y * stageScale);
       applyStageTransform();
 
-      // 更新快捷鈕樣式
       document.querySelectorAll('#btn-focus-overview, #btn-focus-main, #btn-focus-training, #btn-focus-trial, #btn-focus-port').forEach(btn => {
         btn.className = 'flex-1 min-w-[90px] py-1.5 px-2.5 rounded-xl font-bold text-xs flex items-center justify-center space-x-1 transition-all text-[#6d5b45] hover:bg-[#ede1d2]';
       });
@@ -657,7 +666,6 @@
       if (activeBtn) activeBtn.className = 'flex-1 min-w-[90px] py-1.5 px-2.5 rounded-xl font-black text-xs flex items-center justify-center space-x-1 transition-all bg-[#608058] text-white shadow-xs';
     }
 
-    // 熱氣球點擊循序切換視角
     const balloonViews = ['main', 'training', 'trial', 'port'];
     let currentBalloonIndex = 0;
     function triggerBalloonViewSwitch() {
@@ -665,17 +673,15 @@
       focusIsland(balloonViews[currentBalloonIndex]);
     }
 
-    // ================= 2. 過期自動排除判斷 =================
+    // 考期過期自動排除
     function isTargetDateExpired(dateStr) {
       if (!dateStr) return false;
       const now = new Date();
       now.setHours(0, 0, 0, 0);
-
       const parts = dateStr.replace(/-/g, '/').split('/');
       let year = parseInt(parts[0], 10);
       let month = parseInt(parts[1], 10);
       let day = parts[2] ? parseInt(parts[2], 10) : new Date(year, month, 0).getDate();
-
       const target = new Date(year, month - 1, day, 23, 59, 59);
       return now > target;
     }
@@ -692,7 +698,7 @@
       return Math.ceil((target - now) / (1000 * 60 * 60 * 24));
     }
 
-    // ================= 3. 渲染全景大平原圖層 =================
+    // 渲染全平原人物圖層
     function renderAllLayers() {
       const search = (document.getElementById('team-search-input').value || '').trim().toLowerCase();
       const layer = document.getElementById('island-pins-layer');
@@ -710,7 +716,6 @@
         const altitude = calculateStudentAltitude(st.certs);
         const ratio = altitude / 3952;
 
-        // 換算主島座標 (X: 520~880, Y: 110~470 in 1400x800)
         const topY = 460 - ratio * (460 - 110);
         const baseX = 700 + Math.sin(ratio * Math.PI * 2.3) * 110;
         const jitter = ((st.name.charCodeAt(0) * 19) % 50) - 25;
@@ -752,12 +757,14 @@
         pin.onclick = () => openTrainingModal(st);
 
         const days = getDaysRemaining(st.targetDate);
+        const isFemale = (st.name.charCodeAt(st.name.length - 1) % 2 === 0);
+
         pin.innerHTML = `
           <div class="flex flex-col items-center">
             <div class="px-1.5 py-0.2 rounded-full text-[9px] font-black text-white shadow-xs whitespace-nowrap mb-0.5 bg-amber-600">
               ${st.name}・${days !== null ? `剩${days}天` : '備戰'}
             </div>
-            ${createFigureSVG('male', '#d97706')}
+            ${createFigureSVG(isFemale ? 'female' : 'male', '#d97706')}
           </div>
         `;
         layer.appendChild(pin);
@@ -779,39 +786,25 @@
         pin.style.top = `${posY + (idx * 8 % 12) - 6}px`;
         pin.onclick = () => openTrialStudentModal(st);
 
+        const isFemale = (st.name.charCodeAt(st.name.length - 1) % 2 === 0);
         pin.innerHTML = `
           <div class="flex flex-col items-center">
             <div class="px-1.5 py-0.2 rounded-full text-[9px] font-black text-white shadow-xs whitespace-nowrap mb-0.5 bg-blue-600">
               ${st.name}・${st.sector}
             </div>
-            ${createFigureSVG('female', '#2563eb')}
+            ${createFigureSVG(isFemale ? 'female' : 'male', '#2563eb')}
           </div>
         `;
         layer.appendChild(pin);
       });
 
-      // 更新統計數字
       document.getElementById('stat-certified-students').innerText = climbStudents.filter(s => s.certs && s.certs.length > 0).length;
       document.getElementById('stat-total-certs').innerText = climbStudents.reduce((sum, s) => sum + (s.certs ? s.certs.length : 0), 0);
 
       renderActiveRoster();
     }
 
-    function createFigureSVG(genderType, shirtColor) {
-      return `
-        <svg width="24" height="42" viewBox="0 0 36 60" class="char-figure drop-shadow-md">
-          <circle cx="18" cy="16" r="10" fill="#fed7aa"/>
-          <circle cx="14" cy="15" r="1.5" fill="#18181b"/>
-          <circle cx="22" cy="15" r="1.5" fill="#18181b"/>
-          <path d="M 16,20 Q 18,22 20,20" fill="none" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>
-          <rect x="11" y="27" width="14" height="17" rx="3" fill="${shirtColor}"/>
-          <rect x="12" y="44" width="5" height="12" rx="1" fill="#1e293b"/>
-          <rect x="19" y="44" width="5" height="12" rx="1" fill="#1e293b"/>
-        </svg>
-      `;
-    }
-
-    // ================= 4. 右側動態名冊切換 =================
+    // 右側名冊清單
     function switchRosterTab(tab) {
       currentRosterTab = tab;
       document.querySelectorAll('#tab-roster-climb, #tab-roster-training, #tab-roster-trial').forEach(b => {
@@ -857,7 +850,6 @@
           container.appendChild(card);
         });
       } else if (currentRosterTab === 'training') {
-        // 過期項目不列出
         const validList = TRAINING_STUDENTS.filter(s => !isTargetDateExpired(s.targetDate));
         if (validList.length === 0) {
           container.innerHTML = `<p class="p-6 text-center text-xs text-[#8c8275]">尚無有效之備戰登記</p>`;
@@ -873,7 +865,7 @@
               <p class="text-xs font-bold text-slate-800">${st.name} <span class="text-[10px] text-amber-700 font-bold ml-1">${st.targetCert}</span></p>
               <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">${days !== null ? `剩 ${days} 天` : '衝刺'}</span>
             </div>
-            <p class="text-[10px] text-slate-500 truncate italic">“${st.location}”</p>
+            <p class="text-[10px] text-slate-500 truncate italic">“${st.location || '研討刷題中'}”</p>
           `;
           container.appendChild(card);
         });
@@ -894,7 +886,7 @@
       }
     }
 
-    // ================= 5. 系主任巡邏定時跳轉 =================
+    // 系主任巡邏定時換點
     let directorWaypointIdx = 0;
     function startDirectorPatrol() {
       const director = document.getElementById('director-npc');
@@ -909,7 +901,7 @@
       }, 15000);
     }
 
-    // ================= 6. 彈窗 Modal =================
+    // 彈窗 Modal
     function openClimbStudentModal(st) {
       const modal = document.getElementById('student-modal');
       const certCount = st.certs ? st.certs.length : 0;
@@ -926,7 +918,13 @@
           <div><span class="text-[10px] text-[#8c8275]">攀登海拔</span><p class="text-xl font-black text-[#3d6c8f]">${alt.toLocaleString()} m</p></div>
           <div><span class="text-[10px] text-[#8c8275]">考取證照</span><p class="text-xl font-black text-[#4d7a42]">${certCount} 張</p></div>
         </div>
-        <div class="space-y-1.5 max-h-52 overflow-y-auto custom-scroll" id="modal-certs-list"></div>
+        <div>
+          <h4 class="text-xs font-bold text-[#706456] mb-2 flex items-center space-x-1">
+            <i data-lucide="award" class="w-3.5 h-3.5 text-[#b46b2b]"></i>
+            <span>已考取之證照清單</span>
+          </h4>
+          <div class="space-y-1.5 max-h-52 overflow-y-auto custom-scroll" id="modal-certs-list"></div>
+        </div>
       `;
 
       const listEl = document.getElementById('modal-certs-list');
@@ -934,15 +932,17 @@
         listEl.innerHTML = `<p class="p-3 bg-white rounded-xl text-center text-xs text-slate-400">登山口蓄勢待發</p>`;
       } else {
         st.certs.forEach(c => {
+          const m = getCertPoints(c.name);
           listEl.innerHTML += `
             <div class="p-2 bg-white rounded-xl border border-[#ebdcc7] flex justify-between items-center text-xs">
               <span class="font-bold text-slate-700 truncate">${c.name}</span>
-              <span class="px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 font-bold">+${getCertPoints(c.name)}m</span>
+              <span class="px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 font-bold">+${m}m</span>
             </div>
           `;
         });
       }
       modal.classList.remove('hidden');
+      lucide.createIcons();
     }
 
     function openTrainingModal(st) {
@@ -951,20 +951,20 @@
 
       document.getElementById('modal-avatar-box').innerText = '🔥';
       document.getElementById('modal-student-name').innerText = st.name;
-      document.getElementById('modal-student-grade').innerText = `${st.grade}・備考練功島`;
+      document.getElementById('modal-student-grade').innerText = `${st.grade}・熱烈備戰中`;
       document.getElementById('modal-student-id').innerText = `學號：${st.id}`;
 
       document.getElementById('modal-body-content').innerHTML = `
-        <div class="bg-white p-4 rounded-2xl border border-amber-100 space-y-2 text-xs">
-          <div><span class="text-[10px] text-slate-400">攻讀證照</span><p class="font-bold text-sm text-amber-700">${st.targetCert}</p></div>
+        <div class="bg-white p-4 rounded-2xl border border-amber-100 space-y-2.5 shadow-2xs text-xs">
+          <div><span class="text-[10px] font-bold text-slate-400 uppercase">目標攻克證照</span><p class="font-bold text-sm text-amber-700 mt-0.5">${st.targetCert}</p></div>
           <div class="flex justify-between items-baseline pt-1 border-t border-slate-100">
-            <div><span class="text-[10px] text-slate-400">預計考期</span><p class="font-bold text-slate-700">${st.targetDate}</p></div>
-            <span class="px-2 py-0.5 bg-amber-100 text-amber-800 font-black rounded-lg text-xs">${days !== null ? `倒數 ${days} 天` : '衝刺'}</span>
+            <div><span class="text-[10px] font-bold text-slate-400 uppercase">預計考期</span><p class="font-bold text-slate-700 mt-0.5">${st.targetDate}</p></div>
+            <span class="px-2.5 py-1 bg-amber-100 text-amber-800 font-black rounded-lg text-xs">${days !== null ? `倒數 ${days} 天` : '衝刺中'}</span>
           </div>
         </div>
-        <div class="bg-amber-50/70 p-3 rounded-2xl border border-amber-200 text-xs">
-          <p class="text-amber-900 font-bold mb-1">📍 揪團研討地點</p>
-          <p class="text-amber-800 italic">“${st.location}”</p>
+        <div class="bg-amber-50/70 p-4 rounded-2xl border border-amber-200/70 text-xs">
+          <h5 class="font-bold text-amber-900 mb-1 flex items-center space-x-1"><span>📍</span><span>常駐研習地點與揪團備忘</span></h5>
+          <p class="text-amber-800 leading-relaxed italic">“${st.location || '歡迎同路人隨時相約系圖書館或自習室研討刷題！'}”</p>
         </div>
       `;
       modal.classList.remove('hidden');
@@ -978,13 +978,14 @@
       document.getElementById('modal-student-id').innerText = `學號：${st.id}`;
 
       document.getElementById('modal-body-content').innerHTML = `
-        <div class="bg-white p-4 rounded-2xl border border-amber-100 space-y-2 text-xs">
-          <div><span class="text-[10px] text-slate-400">實習機構</span><p class="font-bold text-sm text-slate-800">${st.company}</p></div>
-          <div><span class="text-[10px] text-slate-400">參與職務</span><p class="font-bold text-slate-700">${st.role}</p></div>
+        <div class="bg-white p-4 rounded-2xl border border-amber-100 space-y-2.5 shadow-2xs text-xs">
+          <div><span class="text-[10px] font-bold text-slate-400 uppercase">職場實習機構</span><p class="font-bold text-sm text-slate-800 mt-0.5">${st.company}</p></div>
+          <div><span class="text-[10px] font-bold text-slate-400 uppercase">實習參與職務</span><p class="font-bold text-slate-700 mt-0.5">${st.role}</p></div>
+          ${st.period ? `<div><span class="text-[10px] font-bold text-slate-400 uppercase">實習期間</span><p class="font-medium text-slate-600 mt-0.5">${st.period}</p></div>` : ''}
         </div>
-        <div class="bg-amber-50/60 p-3 rounded-2xl border border-amber-200 text-xs">
-          <p class="text-amber-900 font-bold mb-1">💬 實戰心法</p>
-          <p class="text-amber-800 italic">“${st.quote}”</p>
+        <div class="bg-amber-50/60 p-4 rounded-2xl border border-amber-200/60 text-xs">
+          <h5 class="font-bold text-amber-900 mb-1 flex items-center space-x-1"><span>💬</span><span>學長姐實戰心得與心法</span></h5>
+          <p class="text-amber-800 leading-relaxed italic">“${st.quote}”</p>
         </div>
       `;
       modal.classList.remove('hidden');
@@ -994,17 +995,27 @@
       document.getElementById('student-modal').classList.add('hidden');
     }
 
-    // ================= 7. 初始化與天氣連動 =================
+    // 連動試算表 (支援自動解析 climb, training, trial 三種分頁)
     async function fetchLiveDataFromGoogleSheet(isManual = false) {
       try {
         const res = await fetch(GOOGLE_SHEET_API_URL);
         const liveData = await res.json();
-        if (Array.isArray(liveData) && liveData.length > 0) {
+        
+        // 判斷回傳結構
+        if (liveData.climb && Array.isArray(liveData.climb)) {
+          ALL_STUDENTS = liveData.climb;
+          if (liveData.training && liveData.training.length > 0) TRAINING_STUDENTS = liveData.training;
+          if (liveData.trial && liveData.trial.length > 0) TRIAL_STUDENTS = liveData.trial;
+        } else if (Array.isArray(liveData)) {
           ALL_STUDENTS = liveData;
-          renderAllLayers();
-          if (isManual) alert(`同步成功！已成功連動全系 ${liveData.length} 位同學最新紀錄！`);
         }
-      } catch (err) {}
+
+        renderGradeSummaryCards();
+        renderAllLayers();
+        if (isManual) alert(`同步成功！已成功連動全系最新資料！`);
+      } catch (err) {
+        console.warn("使用快取資料");
+      }
     }
 
     async function fetchJiaoxiWeather() {
@@ -1029,8 +1040,44 @@
       } catch (e) {}
     }
 
+    function renderGradeSummaryCards() {
+      const container = document.getElementById('grade-summary-cards');
+      container.innerHTML = '';
+      const grades = ['ALL', '111級', '112級', '113級', '114級', '115級'];
+
+      grades.forEach(g => {
+        const list = g === 'ALL' ? ALL_STUDENTS : ALL_STUDENTS.filter(s => s.grade === g);
+        const total = list.length;
+        const certified = list.filter(s => s.certs && s.certs.length > 0).length;
+        const totalCerts = list.reduce((sum, s) => sum + (s.certs ? s.certs.length : 0), 0);
+        const isCurrent = selectedGrade === g;
+
+        const card = document.createElement('div');
+        card.className = `p-2.5 sm:p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between shrink-0 w-28 sm:w-auto ${
+          isCurrent ? 'bg-[#608058] text-white shadow-md border-[#608058]' : 'bg-[#fbf7f0] text-[#4b4033] border-[#e8dccb]'
+        }`;
+        card.onclick = () => { selectedGrade = g; renderGradeSummaryCards(); renderAllLayers(); };
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-0.5 sm:mb-1">
+              <span class="font-black text-xs sm:text-sm truncate">${g === 'ALL' ? '🌟全系' : g}</span>
+              <span class="text-[9px] font-bold px-1.5 py-0.2 rounded ${isCurrent ? 'bg-white/20 text-white' : 'bg-[#eeddc8] text-[#5e4b37]'}">${total}</span>
+            </div>
+            <p class="text-[9px] sm:text-[11px] ${isCurrent ? 'text-[#dbe8d5]' : 'text-[#8c8275]'}">已考: <b>${certified}人</b></p>
+          </div>
+          <div class="mt-1.5 pt-1.5 border-t ${isCurrent ? 'border-white/20' : 'border-[#ebdcc7]'} flex items-baseline justify-between text-[10px] sm:text-[11px]">
+            <span class="${isCurrent ? 'text-[#dbe8d5]' : 'text-[#8c8275]'}">總張數</span>
+            <span class="font-black text-xs sm:text-sm">${totalCerts}</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       resetStageTransform();
+      renderGradeSummaryCards();
       renderAllLayers();
       fetchJiaoxiWeather();
       startDirectorPatrol();
