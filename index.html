@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>經濟百岳試煉島・FGU DAE</title>
+  <title>經濟百岳修煉島・FGU DAE</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
@@ -17,41 +17,61 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+    /* 浮島微動漂浮動畫 */
     @keyframes islandFloat {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-5px); }
+      50% { transform: translateY(-6px); }
     }
-    .island-float { animation: islandFloat 7s ease-in-out infinite; }
-
-    @keyframes balloonCruise {
-      0% { transform: translate(660px, 400px) translateY(0); }
-      25% { transform: translate(320px, 220px) translateY(-8px); }
-      50% { transform: translate(1050px, 180px) translateY(0); }
-      75% { transform: translate(1140px, 580px) translateY(-10px); }
-      100% { transform: translate(660px, 400px) translateY(0); }
+    .island-float {
+      animation: islandFloat 6s ease-in-out infinite;
     }
-    .balloon-route { animation: balloonCruise 48s ease-in-out infinite; }
 
-    @keyframes campfireFlicker {
-      0%, 100% { transform: scale(1); opacity: 0.9; }
-      50% { transform: scale(1.15); opacity: 1; filter: drop-shadow(0 0 8px rgba(249,115,22,0.8)); }
+    /* 雲朵漂浮動畫 */
+    @keyframes cloudDriftA {
+      0% { transform: translateX(-40px); }
+      50% { transform: translateX(30px); }
+      100% { transform: translateX(-40px); }
     }
-    .campfire-glow { animation: campfireFlicker 1.8s ease-in-out infinite; }
+    @keyframes cloudDriftB {
+      0% { transform: translateX(20px); }
+      50% { transform: translateX(-35px); }
+      100% { transform: translateX(20px); }
+    }
+    .cloud-a { animation: cloudDriftA 14s ease-in-out infinite; }
+    .cloud-b { animation: cloudDriftB 18s ease-in-out infinite; }
 
+    /* 雨滴動畫 */
+    .rain-drop {
+      position: absolute;
+      background: linear-gradient(transparent, rgba(255, 255, 255, 0.7));
+      width: 1.5px;
+      height: 12px;
+      animation: fall linear infinite;
+      pointer-events: none;
+    }
+    @keyframes fall {
+      0% { transform: translateY(-20px) translateX(0); opacity: 0; }
+      20% { opacity: 0.8; }
+      100% { transform: translateY(480px) translateX(-15px); opacity: 0.2; }
+    }
+
+    /* 氣泡微浮動 */
     @keyframes bubbleFloat {
       0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(-3px); }
     }
-    .speech-bubble { animation: bubbleFloat 4s ease-in-out infinite; }
+    .speech-bubble {
+      animation: bubbleFloat 4s ease-in-out infinite;
+    }
 
+    /* 人物踏步微動 */
     @keyframes walkBounce {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-2px); }
     }
-    .char-figure { animation: walkBounce 2.5s ease-in-out infinite; }
-
-    .viewport-grab { cursor: grab; }
-    .viewport-grabbing { cursor: grabbing; user-select: none; }
+    .char-figure {
+      animation: walkBounce 2.5s ease-in-out infinite;
+    }
   </style>
 </head>
 <body class="bg-[#f5ede2] text-slate-800 min-h-screen flex flex-col selection:bg-amber-200">
@@ -65,17 +85,23 @@
         </div>
         <div class="min-w-0">
           <h1 class="font-black text-sm sm:text-lg text-[#3d4a39] tracking-tight leading-tight truncate flex items-center gap-1.5">
-            經濟百岳群島大平原
-            <span class="text-[9px] sm:text-xs font-bold px-2 py-0.5 bg-[#e3ecd7] text-[#4d6a42] rounded-full shrink-0">全島同屏航海版</span>
+            經濟百岳修煉島
+            <span class="text-[9px] sm:text-xs font-bold px-2 py-0.5 bg-[#e3ecd7] text-[#4d6a42] rounded-full shrink-0">礁溪連動版</span>
           </h1>
-          <p class="text-[10px] sm:text-xs text-[#8c8275] truncate">佛光大學應用經濟學系</p>
+          <p class="text-[10px] sm:text-xs text-[#8c8275] truncate">佛光大學應用經濟學系・立體繪本生態榜</p>
         </div>
       </div>
 
-      <div class="flex items-center space-x-2 shrink-0">
-        <div class="flex items-center space-x-1.5 bg-[#eeddc8]/70 border border-[#ddcbb2] px-2.5 sm:px-3 py-1 rounded-2xl text-[10px] sm:text-xs">
+      <!-- 右側資訊：雲端狀態與天氣 -->
+      <div class="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
+        <div id="sync-status" class="hidden md:flex items-center space-x-1 px-2.5 py-1 rounded-full bg-[#e8efe0] border border-[#cfdcc3] text-[#4a6b3d] text-[10px] font-bold">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#528741] animate-pulse"></span>
+          <span>雲端試算表連動中</span>
+        </div>
+
+        <div class="flex items-center space-x-1 sm:space-x-2 bg-[#eeddc8]/70 border border-[#ddcbb2] px-2.5 sm:px-3 py-1 rounded-2xl">
           <span id="weather-icon" class="text-base sm:text-lg">🌤️</span>
-          <div class="text-left leading-tight">
+          <div class="text-left text-[10px] sm:text-xs leading-tight">
             <p class="font-black text-[#4b4033]" id="weather-temp">--°C</p>
             <p class="text-[8px] sm:text-[10px] text-[#7d6851] font-medium hidden sm:block" id="weather-desc">連線中</p>
           </div>
@@ -87,31 +113,7 @@
   <!-- 主內容區 -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 md:p-6 flex flex-col gap-4 sm:gap-6">
 
-    <!-- 🧭 群島鏡頭快速鎖定導覽紐 -->
-    <div class="bg-[#fbf7f0] rounded-2xl p-2 border border-[#e8dccb] shadow-xs flex items-center justify-between gap-1 overflow-x-auto no-scrollbar">
-      <button onclick="focusIsland('overview')" id="btn-focus-overview" class="flex-1 min-w-[90px] py-1.5 px-2.5 rounded-xl font-black text-xs flex items-center justify-center space-x-1 transition-all bg-[#4b3c2c] text-white">
-        <span>🗺️</span>
-        <span>群島全覽</span>
-      </button>
-      <button onclick="focusIsland('main')" id="btn-focus-main" class="flex-1 min-w-[110px] py-1.5 px-2.5 rounded-xl font-bold text-xs flex items-center justify-center space-x-1 transition-all bg-[#608058] text-white shadow-xs">
-        <span>🏔️</span>
-        <span>玉山主島 (考照)</span>
-      </button>
-      <button onclick="focusIsland('training')" id="btn-focus-training" class="flex-1 min-w-[110px] py-1.5 px-2.5 rounded-xl font-bold text-xs flex items-center justify-center space-x-1 transition-all text-[#6d5b45] hover:bg-[#ede1d2]">
-        <span>🧘</span>
-        <span>備考練功島</span>
-      </button>
-      <button onclick="focusIsland('trial')" id="btn-focus-trial" class="flex-1 min-w-[110px] py-1.5 px-2.5 rounded-xl font-bold text-xs flex items-center justify-center space-x-1 transition-all text-[#6d5b45] hover:bg-[#ede1d2]">
-        <span>⚔️</span>
-        <span>實戰試煉島</span>
-      </button>
-      <button onclick="focusIsland('port')" id="btn-focus-port" class="flex-1 min-w-[110px] py-1.5 px-2.5 rounded-xl font-bold text-xs flex items-center justify-center space-x-1 transition-all text-[#6d5b45] hover:bg-[#ede1d2]">
-        <span>🗼</span>
-        <span>燈塔浮空港</span>
-      </button>
-    </div>
-
-    <!-- 年級卡片列 -->
+    <!-- 年級卡片列（溫暖奶茶風橫向平滑捲動） -->
     <div class="flex overflow-x-auto no-scrollbar gap-2.5 sm:grid sm:grid-cols-3 lg:grid-cols-6 pb-1" id="grade-summary-cards"></div>
 
     <!-- 控制列：統計摘要與搜尋 -->
@@ -119,16 +121,15 @@
       <div class="flex items-center justify-between w-full sm:w-auto text-xs text-[#706456] overflow-x-auto whitespace-nowrap">
         <span class="font-bold text-[#3d4a39]" id="current-filter-title">全體學生狀態</span>
         <div class="flex items-center space-x-2 ml-2">
-          <span>・考取 <b id="stat-certified-students" class="text-[#4b7a42]">0</b> 人</span>
+          <span>・共 <b id="stat-total-students" class="text-[#3b6080]">0</b> 人</span>
+          <span>・已考取 <b id="stat-certified-students" class="text-[#4b7a42]">0</b> 人</span>
           <span>・總張數 <b id="stat-total-certs" class="text-[#b46b2b]">0</b> 張</span>
-          <span>・備戰中 <b id="stat-training-count" class="text-amber-600">0</b> 人</span>
-          <span>・職場體驗 <b id="stat-trial-count" class="text-blue-600">0</b> 人</span>
         </div>
       </div>
 
       <div class="flex items-center space-x-2 w-full sm:w-auto">
         <div class="relative w-full sm:w-64">
-          <input type="text" id="team-search-input" oninput="renderAllLayers()" placeholder="搜尋學生姓名或學號..." class="w-full pl-8 pr-3 py-1.5 bg-[#f4ece1] border border-[#e0d2c0] rounded-xl text-xs outline-none focus:bg-white focus:ring-2 focus:ring-[#8fa878]">
+          <input type="text" id="team-search-input" oninput="renderTeamView()" placeholder="搜尋姓名或學號..." class="w-full pl-8 pr-3 py-1.5 bg-[#f4ece1] border border-[#e0d2c0] rounded-xl text-xs outline-none focus:bg-white focus:ring-2 focus:ring-[#8fa878]">
           <i data-lucide="search" class="w-3.5 h-3.5 text-[#9e9080] absolute left-2.5 top-2.5"></i>
         </div>
         <button onclick="fetchLiveDataFromGoogleSheet(true)" title="重新整理試算表" class="p-2 bg-[#f4ece1] hover:bg-[#ede1d2] text-[#6d5b45] border border-[#e0d2c0] rounded-xl transition flex items-center justify-center shrink-0">
@@ -140,204 +141,182 @@
     <!-- 雙欄架構 -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
       
-      <!-- 左側：全景畫布 (1400 x 800) -->
+      <!-- 左側：繪本立體浮島全景圖 -->
       <div class="lg:col-span-8 bg-[#fbf7f0] rounded-3xl p-3 sm:p-5 border border-[#e8dccb] shadow-xs flex flex-col">
-        <div class="flex items-center justify-between mb-2">
-          <div class="flex items-center space-x-2">
-            <span class="text-base">🗺️</span>
-            <h2 class="font-black text-xs sm:text-sm text-[#3d4a39]">群島全景大平原（滑鼠滾輪/雙指縮放，拖曳平移）</h2>
+        <div class="flex items-center justify-between mb-2 sm:mb-3">
+          <h2 class="font-black text-xs sm:text-sm text-[#3d4a39] flex items-center space-x-1.5">
+            <span>🏝️</span>
+            <span>立體繪本百岳島・攀登全景動態</span>
+          </h2>
+          <div class="flex items-center space-x-1.5 text-[9px] sm:text-[10px] text-[#8c8275]">
+            <span class="inline-block w-2 h-2 rounded-full bg-[#8c6da6]"></span> 111
+            <span class="inline-block w-2 h-2 rounded-full bg-[#527e9b]"></span> 112
+            <span class="inline-block w-2 h-2 rounded-full bg-[#5b8753]"></span> 113
+            <span class="inline-block w-2 h-2 rounded-full bg-[#c78b43]"></span> 114
+            <span class="inline-block w-2 h-2 rounded-full bg-[#b86178]"></span> 115
           </div>
-          <span class="text-[10px] text-amber-800 font-bold bg-amber-100/80 px-2 py-0.5 rounded-full cursor-pointer hover:bg-amber-200" onclick="triggerBalloonViewSwitch()">
-            🎈 點擊熱氣球巡弋跳轉
-          </span>
         </div>
 
-        <div id="sky-canvas-container" class="relative w-full h-[460px] sm:h-[540px] md:h-[600px] rounded-2xl overflow-hidden border border-[#decbb7] shadow-inner transition-colors duration-1000 viewport-grab">
+        <!-- 畫布容器（隨礁溪日落天色柔和變換） -->
+        <div id="sky-canvas-container" class="relative w-full h-[400px] sm:h-[480px] md:h-[530px] rounded-2xl overflow-hidden border border-[#decbb7] shadow-inner transition-colors duration-1000 flex items-center justify-center">
           
+          <!-- 動態雨滴圖層 -->
           <div id="rain-layer" class="absolute inset-0 pointer-events-none hidden z-20"></div>
-          
-          <div id="celestial-body" class="absolute transition-all duration-1000 z-10 pointer-events-none" style="right: 35px; top: 25px;">
+
+          <!-- 太陽 / 月亮 -->
+          <div id="celestial-body" class="absolute transition-all duration-1000 z-10" style="right: 35px; top: 25px;">
             <div id="celestial-graphic" class="w-10 h-10 sm:w-13 sm:h-13 rounded-full bg-[#fcd472] shadow-[0_0_20px_rgba(252,212,114,0.6)] flex items-center justify-center text-lg sm:text-xl">
               ☀️
             </div>
           </div>
 
-          <div id="island-pan-zoom-stage" class="absolute left-0 top-0 w-[1400px] h-[800px] origin-top-left transition-transform duration-300 ease-out select-none">
-            
-            <svg class="w-full h-full" viewBox="0 0 1400 800" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="mainGrass" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#8bb777"/><stop offset="60%" stop-color="#678f54"/><stop offset="100%" stop-color="#4a6d3a"/>
-                </linearGradient>
-                <linearGradient id="earthGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#a47754"/><stop offset="50%" stop-color="#7e5334"/><stop offset="100%" stop-color="#4e311d"/>
-                </linearGradient>
-                <linearGradient id="snowGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#e2ecf2"/>
-                </linearGradient>
-              </defs>
-
-              <!-- 索道吊橋 -->
-              <path d="M 460,400 Q 380,340 330,280" fill="none" stroke="#b09e88" stroke-width="6" stroke-dasharray="8,5" stroke-linecap="round"/>
-              <line x1="460" y1="400" x2="330" y2="280" stroke="#7d6b56" stroke-width="2" stroke-dasharray="3,3"/>
-
-              <path d="M 940,390 Q 1010,320 1060,260" fill="none" stroke="#b09e88" stroke-width="6" stroke-dasharray="8,5" stroke-linecap="round"/>
-              <line x1="940" y1="390" x2="1060" y2="260" stroke="#7d6b56" stroke-width="2" stroke-dasharray="3,3"/>
-
-              <path d="M 920,490 Q 1030,520 1130,560" fill="none" stroke="#d5be9b" stroke-width="8" stroke-linecap="round"/>
-
-              <!-- 1. 中央：玉山百岳島 -->
-              <g class="island-float" id="svg-main-island">
-                <ellipse cx="700" cy="580" rx="270" ry="24" fill="#4d3b2b" opacity="0.25"/>
-                <path d="M 450,420 Q 480,545 700,560 Q 920,545 950,420 C 900,470 780,495 700,495 C 620,495 500,470 450,420 Z" fill="url(#earthGrad)"/>
-                <ellipse cx="700" cy="425" rx="255" ry="75" fill="url(#mainGrass)"/>
-                <path d="M 530,410 C 560,320 610,240 645,240 C 675,240 710,310 730,410 Z" fill="#587f4c" opacity="0.8"/>
-                <path d="M 670,410 C 710,300 760,220 800,220 C 830,220 870,300 900,410 Z" fill="#537b46" opacity="0.75"/>
-                <path d="M 510,420 C 590,320 650,150 695,95 C 705,85 715,85 725,95 C 770,150 830,320 910,420 Z" fill="#4d7240"/>
-                <path d="M 695,95 C 715,85 725,95 740,150 C 770,230 800,320 835,420 C 775,430 710,430 680,420 C 665,330 680,210 695,95 Z" fill="#669152" opacity="0.7"/>
-                <path d="M 670,135 C 685,110 695,90 710,90 C 725,90 735,110 750,135 C 740,150 730,145 720,160 C 710,150 695,155 685,165 C 680,150 675,155 670,135 Z" fill="url(#snowGrad)"/>
-                <path d="M 560,445 Q 660,410 780,395 T 620,295 T 780,210 T 710,110" fill="none" stroke="#e8ded0" stroke-width="8" stroke-dasharray="10,6" stroke-linecap="round"/>
-                <line x1="480" y1="110" x2="920" y2="110" stroke="#e16161" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.5"/>
-                <text x="495" y="105" font-size="11" font-weight="900" fill="#c53b3b">🚩 玉山主峰頂 (3,952m)</text>
-                <line x1="480" y1="210" x2="920" y2="210" stroke="#d97736" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.5"/>
-                <text x="495" y="205" font-size="10" font-weight="bold" fill="#b45719">⛺ 排雲山莊 (3,402m)</text>
-                <line x1="480" y1="295" x2="920" y2="295" stroke="#3d6c8f" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.5"/>
-                <text x="495" y="290" font-size="10" font-weight="bold" fill="#2d5573">🌲 白木林觀景台 (2,700m)</text>
-                <line x1="480" y1="395" x2="920" y2="395" stroke="#48783d" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.5"/>
-                <text x="495" y="390" font-size="10" font-weight="bold" fill="#325e28">🛖 孟祿亭 (1,800m)</text>
-              </g>
-
-              <!-- 2. 左上角：備考練功島 -->
-              <g class="island-float" id="svg-training-island" style="animation-delay: -2s;">
-                <ellipse cx="260" cy="305" rx="160" ry="15" fill="#4d3b2b" opacity="0.2"/>
-                <path d="M 120,230 Q 150,300 260,305 Q 370,300 400,230 C 360,265 290,280 260,280 C 230,280 160,265 120,230 Z" fill="#694d37"/>
-                <ellipse cx="260" cy="225" rx="145" ry="50" fill="#68935a"/>
-                <circle cx="210" cy="210" r="10" fill="#4a3322"/>
-                <circle cx="210" cy="208" r="5" fill="#f97316" class="campfire-glow"/>
-                <text x="180" y="190" font-size="10" font-weight="900" fill="#26401f">⛺ 銀行證券期貨營火</text>
-                <circle cx="310" cy="210" r="10" fill="#4a3322"/>
-                <circle cx="310" cy="208" r="5" fill="#f97316" class="campfire-glow"/>
-                <text x="280" y="190" font-size="10" font-weight="900" fill="#26401f">📜 保險書閣</text>
-                <circle cx="260" cy="245" r="10" fill="#4a3322"/>
-                <circle cx="260" cy="243" r="5" fill="#f97316" class="campfire-glow"/>
-                <text x="235" y="268" font-size="10" font-weight="900" fill="#26401f">🤖 AI研習亭</text>
-                <text x="210" y="150" font-size="12" font-weight="900" fill="#3f2e1f">🧘 備考練功島</text>
-              </g>
-
-              <!-- 3. 右上角：實戰試煉島 -->
-              <g class="island-float" id="svg-trial-island" style="animation-delay: -4s;">
-                <ellipse cx="1120" cy="295" rx="170" ry="16" fill="#4d3b2b" opacity="0.2"/>
-                <path d="M 970,220 Q 1010,290 1120,295 Q 1230,290 1270,220 C 1230,255 1160,270 1120,270 C 1080,270 1010,255 970,220 Z" fill="#6f4a30"/>
-                <ellipse cx="1120" cy="220" rx="155" ry="52" fill="#759e66"/>
-                <rect x="1030" y="150" width="40" height="35" rx="2" fill="#3b536b"/>
-                <polygon points="1020,150 1050,130 1080,150" fill="#243444"/>
-                <text x="1033" y="172" font-size="8" font-weight="900" fill="#ffffff">🏦 銀行</text>
-                <rect x="1170" y="130" width="38" height="55" rx="2" fill="#2d4059"/>
-                <rect x="1175" y="140" width="28" height="8" fill="#ef4444"/>
-                <text x="1173" y="168" font-size="8" font-weight="900" fill="#ffffff">📈 證券</text>
-                <path d="M 1045,210 Q 1060,195 1075,210 Z" fill="#d97706"/>
-                <line x1="1060" y1="210" x2="1060" y2="230" stroke="#78350f" stroke-width="2"/>
-                <text x="1042" y="242" font-size="8" font-weight="900" fill="#78350f">🛡️ 保險</text>
-                <line x1="1185" y1="195" x2="1185" y2="230" stroke="#be123c" stroke-width="2"/>
-                <circle cx="1185" cy="195" r="3" fill="#f43f5e"/>
-                <text x="1170" y="242" font-size="8" font-weight="900" fill="#881337">⚡ 期貨</text>
-                <text x="1070" y="115" font-size="12" font-weight="900" fill="#3f2e1f">⚔️ 實戰試煉島</text>
-              </g>
-
-              <!-- 4. 右下角：燈塔浮空港 -->
-              <g class="island-float" id="svg-port-island" style="animation-delay: -1s;">
-                <ellipse cx="1180" cy="650" rx="140" ry="14" fill="#4d3b2b" opacity="0.2"/>
-                <path d="M 1060,580 Q 1090,645 1180,650 Q 1270,645 1300,580 C 1260,610 1210,625 1180,625 C 1150,625 1100,610 1060,580 Z" fill="#694d37"/>
-                <ellipse cx="1180" cy="580" rx="125" ry="45" fill="#6a9662"/>
-                <polygon points="1210,560 1230,560 1225,480 1215,480" fill="#ffffff"/>
-                <polygon points="1212,540 1228,540 1226,520 1214,520" fill="#ef4444"/>
-                <polygon points="1214,500 1226,500 1225,480 1215,480" fill="#ef4444"/>
-                <circle cx="1220" cy="475" r="7" fill="#fde047" opacity="0.85"/>
-                <text x="1145" y="520" font-size="12" font-weight="900" fill="#3f2e1f">🗼 燈塔浮空港</text>
-              </g>
+          <!-- 繪本軟綿浮雲 A -->
+          <div class="absolute left-6 top-8 cloud-a opacity-85 pointer-events-none z-10">
+            <svg width="60" height="30" viewBox="0 0 70 35">
+              <path d="M 15,25 Q 15,15 25,15 Q 30,8 42,12 Q 52,10 56,18 Q 65,20 62,28 Q 50,32 15,25 Z" fill="#ffffff" opacity="0.9"/>
             </svg>
-
-            <!-- 學生公仔與地標標籤圖層 -->
-            <div id="island-pins-layer" class="absolute inset-0 pointer-events-none z-20"></div>
-
-            <!-- 巡弋熱氣球 -->
-            <div id="cruise-balloon" onclick="triggerBalloonViewSwitch()" class="absolute left-0 top-0 balloon-route pointer-events-auto cursor-pointer z-30 transition-transform duration-500 hover:scale-125" title="點擊熱氣球切換視角！">
-              <div class="flex flex-col items-center">
-                <div class="relative -top-1 bg-[#1e3a8a] text-amber-300 text-[8px] font-black px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">
-                  🚩 FGU DAE
-                  <div class="absolute -right-1 top-1 w-0 h-0 border-t-2 border-t-transparent border-b-2 border-b-transparent border-l-4 border-l-[#1e3a8a]"></div>
-                </div>
-                <svg width="40" height="52" viewBox="0 0 50 65" class="drop-shadow-lg">
-                  <path d="M 25,2 C 10,2 2,15 2,26 C 2,36 12,46 20,50 L 30,50 C 38,46 48,36 48,26 C 48,15 40,2 25,2 Z" fill="#f97316"/>
-                  <path d="M 25,2 C 18,2 14,15 14,26 C 14,36 18,46 22,50 L 28,50 C 32,46 36,36 36,26 C 36,15 32,2 25,2 Z" fill="#facc15"/>
-                  <path d="M 25,2 C 22,2 20,15 20,26 C 20,36 22,46 23.5,50 L 26.5,50 C 28,46 30,36 30,26 C 30,15 28,2 25,2 Z" fill="#ffffff"/>
-                  <line x1="21" y1="50" x2="21" y2="56" stroke="#451a03" stroke-width="1.5"/>
-                  <line x1="29" y1="50" x2="29" y2="56" stroke="#451a03" stroke-width="1.5"/>
-                  <rect x="19" y="56" width="12" height="8" rx="2" fill="#78350f"/>
-                </svg>
-              </div>
-            </div>
-
-            <!-- 系主任巡島 NPC -->
-            <div id="director-npc" class="absolute pointer-events-auto cursor-pointer z-30" style="left: 700px; top: 380px; transform: translate(-50%, -100%); transition: left 5s ease-in-out, top 5s ease-in-out;">
-              <div class="speech-bubble relative -top-1.5 bg-[#fcd472] text-[#3c2a13] text-[9px] sm:text-[11px] font-black px-2.5 sm:px-3 py-1 rounded-2xl shadow-md border border-white whitespace-nowrap">
-                <span id="director-quote">今天礁溪天氣不錯，大家多考一張！</span>
-                <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-[#fcd472] rotate-45 border-r border-b border-white"></div>
-              </div>
-              <div class="flex flex-col items-center select-none">
-                <svg width="34" height="52" viewBox="0 0 50 74" class="drop-shadow-md sm:w-[42px] sm:h-[62px]">
-                  <path d="M 14,18 C 11,13 13,6 20,4 C 26,2 35,3 41,7 C 44,10 44,17 38,19 C 32,20 18,21 14,18 Z" fill="#1c1917"/>
-                  <circle cx="28" cy="22" r="13" fill="#fed7aa"/>
-                  <path d="M 17,14 Q 22,13 25,15" fill="none" stroke="#292524" stroke-width="2" stroke-linecap="round"/>
-                  <path d="M 31,15 Q 34,13 39,14" fill="none" stroke="#292524" stroke-width="2" stroke-linecap="round"/>
-                  <ellipse cx="21" cy="18" rx="2" ry="1.2" fill="#1c1917"/>
-                  <ellipse cx="35" cy="18" rx="2" ry="1.2" fill="#1c1917"/>
-                  <path d="M 23,26 Q 28,30 33,26" fill="none" stroke="#78350f" stroke-width="1.8" stroke-linecap="round"/>
-                  <polygon points="25,35 31,35 28,42" fill="#1e3a8a"/>
-                  <path d="M 18,35 C 16,36 15,48 15,53 L 41,53 C 41,48 40,36 38,35 L 32,45 L 24,45 Z" fill="#475569"/>
-                  <rect x="19" y="53" width="7" height="14" rx="1.5" fill="#1e293b"/>
-                  <rect x="30" y="53" width="7" height="14" rx="1.5" fill="#1e293b"/>
-                </svg>
-                <span class="mt-0.5 bg-[#3d4a39] text-[#fcd472] text-[8px] sm:text-[9px] px-2 py-0.2 rounded-full font-bold">系主任巡島</span>
-              </div>
-            </div>
-
           </div>
-        </div>
+          <!-- 繪本軟綿浮雲 B -->
+          <div class="absolute right-20 top-24 cloud-b opacity-75 pointer-events-none z-10">
+            <svg width="75" height="35" viewBox="0 0 80 40">
+              <path d="M 20,30 Q 18,18 30,16 Q 38,10 52,14 Q 65,12 68,22 Q 78,25 72,34 Q 60,37 20,30 Z" fill="#ffffff" opacity="0.85"/>
+            </svg>
+          </div>
 
-        <div class="flex items-center justify-between text-[11px] text-[#8c8275] pt-2 px-1">
-          <span>💡 提示：可用滑鼠滾輪/手勢自由縮放畫布，拖曳任意平移</span>
-          <button onclick="resetStageTransform()" class="px-2.5 py-1 bg-[#ede1d2] hover:bg-[#e2d3c0] text-[#5e4b37] rounded-lg font-bold transition">
-            重設視角居中
-          </button>
+          <!-- 立體浮島主體 SVG（包含浮空泥土層、草皮台地、石階） -->
+          <svg class="w-full h-full island-float select-none" viewBox="0 0 800 520" preserveAspectRatio="none">
+            <defs>
+              <!-- 草地立體漸層 -->
+              <linearGradient id="grassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#8bb777"/>
+                <stop offset="60%" stop-color="#678f54"/>
+                <stop offset="100%" stop-color="#4a6d3a"/>
+              </linearGradient>
+              <!-- 泥土地層立體切面漸層 -->
+              <linearGradient id="earthGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#a47754"/>
+                <stop offset="50%" stop-color="#7e5334"/>
+                <stop offset="100%" stop-color="#4e311d"/>
+              </linearGradient>
+              <!-- 雪山頂部漸層 -->
+              <linearGradient id="snowGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="100%" stop-color="#e2ecf2"/>
+              </linearGradient>
+            </defs>
+
+            <!-- 浮空陰影（小島下方的投影） -->
+            <ellipse cx="400" cy="495" rx="270" ry="22" fill="#5c4832" opacity="0.25"/>
+
+            <!-- 1. 浮島厚實地層底座 (土石切面) -->
+            <path d="M 170,390 C 230,460 330,490 400,490 C 470,490 570,460 630,390 C 600,430 490,475 400,475 C 310,475 200,430 170,390 Z" fill="#3c2617" opacity="0.6"/>
+            <path d="M 150,350 Q 180,455 400,470 Q 620,455 650,350 C 600,400 480,420 400,420 C 320,420 200,400 150,350 Z" fill="url(#earthGrad)"/>
+            <!-- 懸浮小碎石 -->
+            <ellipse cx="140" cy="425" rx="8" ry="4" fill="#6c482f"/>
+            <ellipse cx="645" cy="410" rx="10" ry="5" fill="#5e3e27"/>
+            <circle cx="670" cy="385" r="4" fill="#755034"/>
+
+            <!-- 2. 浮島綠意草坪表面 (立體基座) -->
+            <ellipse cx="400" cy="355" rx="255" ry="70" fill="url(#grassGrad)"/>
+
+            <!-- 3. 百岳島嶼山體層疊（低飽和水彩厚實繪本山峰） -->
+            <!-- 遠景側峰 (青綠帶黃) -->
+            <path d="M 230,340 C 260,250 310,180 345,180 C 375,180 410,240 430,340 Z" fill="#587f4c" opacity="0.8"/>
+            <path d="M 370,340 C 410,230 460,160 500,160 C 530,160 570,230 600,340 Z" fill="#537b46" opacity="0.75"/>
+
+            <!-- 玉山主峰核心大山體 -->
+            <path d="M 210,350 C 290,260 350,110 395,65 C 405,55 415,55 425,65 C 470,110 530,260 610,350 Z" fill="#4d7240"/>
+            
+            <!-- 山腰受光面 (亮綠色水彩切面) -->
+            <path d="M 395,65 C 415,55 425,65 440,110 C 470,180 500,260 535,350 C 475,360 410,360 380,350 C 365,270 380,160 395,65 Z" fill="#669152" opacity="0.7"/>
+
+            <!-- 主峰童話糖霜積雪帽子 (如日系插畫波浪感雪頂) -->
+            <path d="M 370,105 C 385,80 395,60 410,60 C 425,60 435,80 450,105 C 440,120 430,115 420,130 C 410,120 395,125 385,135 C 380,120 375,125 370,105 Z" fill="url(#snowGrad)"/>
+
+            <!-- 4. 環島盤山探索石階步道 (米白立體石徑) -->
+            <path id="real-mountain-path" d="M 260,375 Q 360,340 480,325 T 320,235 T 480,160 T 410,75" fill="none" stroke="#e8ded0" stroke-width="8" stroke-dasharray="10,6" stroke-linecap="round"/>
+
+            <!-- 5. 繪本小地標與營地標線 -->
+            <line x1="180" y1="75" x2="620" y2="75" stroke="#e16161" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.5"/>
+            <text x="195" y="70" font-size="11" font-weight="900" fill="#c53b3b">🚩 玉山主峰頂 (3,952m)</text>
+
+            <line x1="180" y1="160" x2="620" y2="160" stroke="#d97736" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.5"/>
+            <text x="195" y="155" font-size="10" font-weight="bold" fill="#b45719">⛺ 排雲山莊 (3,402m)</text>
+
+            <line x1="180" y1="235" x2="620" y2="235" stroke="#3d6c8f" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.5"/>
+            <text x="195" y="230" font-size="10" font-weight="bold" fill="#2d5573">🌲 白木林觀景台 (2,700m)</text>
+
+            <line x1="180" y1="325" x2="620" y2="325" stroke="#48783d" stroke-dasharray="4,4" stroke-width="1.5" opacity="0.5"/>
+            <text x="195" y="320" font-size="10" font-weight="bold" fill="#325e28">🛖 孟祿亭 (1,800m)</text>
+
+            <!-- 島嶼邊緣的小樹木造景 -->
+            <circle cx="215" cy="365" r="7" fill="#466935"/>
+            <circle cx="225" cy="360" r="5" fill="#588044"/>
+            <circle cx="585" cy="355" r="8" fill="#466935"/>
+            <circle cx="575" cy="360" r="6" fill="#5c8747"/>
+          </svg>
+
+          <!-- 學生公仔圖層（無圓框立體探索者） -->
+          <div id="team-pins-layer" class="absolute inset-0 pointer-events-none z-20"></div>
+
+          <!-- 系主任慢速巡島 NPC -->
+          <div id="director-npc" class="absolute pointer-events-auto cursor-pointer z-30" style="left: 51%; top: 46%; transform: translate(-50%, -100%); transition: left 4s ease-in-out, top 4s ease-in-out;">
+            <div class="speech-bubble relative -top-1.5 bg-[#fcd472] text-[#3c2a13] text-[9px] sm:text-[11px] font-black px-2.5 sm:px-3 py-1 rounded-2xl shadow-md border border-white whitespace-nowrap">
+              <span id="director-quote">今天礁溪天氣不錯，大家多考一張！</span>
+              <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-[#fcd472] rotate-45 border-r border-b border-white"></div>
+            </div>
+            
+            <div class="flex flex-col items-center select-none">
+              <svg width="34" height="52" viewBox="0 0 50 74" class="drop-shadow-md sm:w-[42px] sm:h-[62px]">
+                <path d="M 14,18 C 11,13 13,6 20,4 C 26,2 35,3 41,7 C 44,10 44,17 38,19 C 32,20 18,21 14,18 Z" fill="#1c1917"/>
+                <path d="M 12,17 C 11,21 14,23 15,23 C 14,18 15,15 17,14 Z" fill="#1c1917"/>
+                <circle cx="28" cy="22" r="13" fill="#fed7aa"/>
+                <path d="M 17,14 Q 22,13 25,15" fill="none" stroke="#292524" stroke-width="2" stroke-linecap="round"/>
+                <path d="M 31,15 Q 34,13 39,14" fill="none" stroke="#292524" stroke-width="2" stroke-linecap="round"/>
+                <ellipse cx="21" cy="18" rx="2" ry="1.2" fill="#1c1917"/>
+                <ellipse cx="35" cy="18" rx="2" ry="1.2" fill="#1c1917"/>
+                <ellipse cx="16" cy="23" rx="2.5" ry="1.3" fill="#f87171" opacity="0.6"/>
+                <ellipse cx="40" cy="23" rx="2.5" ry="1.3" fill="#f87171" opacity="0.6"/>
+                <path d="M 23,26 Q 28,30 33,26" fill="none" stroke="#78350f" stroke-width="1.8" stroke-linecap="round"/>
+                <polygon points="25,35 31,35 28,42" fill="#1e3a8a"/>
+                <path d="M 18,35 C 16,36 15,48 15,53 L 41,53 C 41,48 40,36 38,35 L 32,45 L 24,45 Z" fill="#475569"/>
+                <path d="M 18,35 L 25,46 L 22,46 Z" fill="#334155"/>
+                <path d="M 38,35 L 31,46 L 34,46 Z" fill="#334155"/>
+                <rect x="11" y="36" width="5.5" height="15" rx="2.5" fill="#475569"/>
+                <rect x="39.5" y="36" width="5.5" height="15" rx="2.5" fill="#475569"/>
+                <rect x="19" y="53" width="7" height="14" rx="1.5" fill="#1e293b"/>
+                <rect x="30" y="53" width="7" height="14" rx="1.5" fill="#1e293b"/>
+                <rect x="18" y="67" width="8" height="4" rx="1.5" fill="#0f172a"/>
+                <rect x="30" y="67" width="8" height="4" rx="1.5" fill="#0f172a"/>
+              </svg>
+              <span class="mt-0.5 bg-[#3d4a39] text-[#fcd472] border border-[#fcd472]/40 text-[8px] sm:text-[9px] px-2 py-0.2 rounded-full font-bold shadow-xs">系主任</span>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <!-- 右側：全島名冊排行榜 -->
+      <!-- 右側：學生考照成就排行榜 -->
       <div class="lg:col-span-4 bg-[#fbf7f0] rounded-3xl p-4 sm:p-5 border border-[#e8dccb] shadow-xs flex flex-col gap-3">
         <div class="flex items-center justify-between border-b border-[#ebdcc7] pb-2">
           <h2 class="font-black text-xs sm:text-sm text-[#3d4a39] flex items-center space-x-1.5">
             <span>🏆</span>
-            <span id="roster-panel-title">百岳考照榮譽榜</span>
+            <span>修煉島考照排行榜</span>
           </h2>
-          <div class="flex items-center space-x-1 text-[10px]">
-            <button onclick="switchRosterTab('climb')" id="tab-roster-climb" class="px-2 py-0.5 rounded font-black bg-[#608058] text-white">考照</button>
-            <button onclick="switchRosterTab('training')" id="tab-roster-training" class="px-2 py-0.5 rounded font-bold bg-[#ede1d2] text-[#6d5b45]">練功</button>
-            <button onclick="switchRosterTab('trial')" id="tab-roster-trial" class="px-2 py-0.5 rounded font-bold bg-[#ede1d2] text-[#6d5b45]">實戰</button>
-          </div>
+          <span class="text-[10px] text-[#8c8275]">點選查看修煉履歷</span>
         </div>
 
-        <div id="active-roster-list" class="custom-scroll max-h-[460px] sm:max-h-[520px] overflow-y-auto space-y-2 pr-1"></div>
+        <div id="team-roster-list" class="custom-scroll max-h-[380px] sm:max-h-[460px] overflow-y-auto space-y-2 pr-1"></div>
       </div>
     </div>
   </main>
 
-  <!-- 彈窗 Modal -->
+  <!-- 學生登山履歷手冊 Modal -->
   <div id="student-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-[#fbf7f0] w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#decbb7] overflow-hidden max-h-[85vh] flex flex-col">
       <div class="p-4 sm:p-5 border-b border-[#ebdcc7] flex items-center justify-between bg-[#f4ece1] shrink-0">
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#eeddc8] text-[#5e4b37] flex items-center justify-center text-xl sm:text-2xl font-black shadow-inner" id="modal-avatar-box">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#eeddc8] text-[#5e4b37] flex items-center justify-center text-xl sm:text-2xl font-black shadow-inner">
             🧗
           </div>
           <div>
@@ -351,7 +330,26 @@
         <button onclick="closeStudentModal()" class="w-8 h-8 rounded-full hover:bg-[#e4d6c4] flex items-center justify-center text-[#8c8275] hover:text-[#3d4a39] transition">✕</button>
       </div>
 
-      <div class="p-4 sm:p-5 space-y-4 overflow-y-auto custom-scroll" id="modal-body-content"></div>
+      <div class="p-4 sm:p-5 space-y-4 overflow-y-auto custom-scroll">
+        <div class="grid grid-cols-2 gap-2 sm:gap-3 bg-[#f2e7d8]/60 p-3 rounded-2xl border border-[#ded0bf] text-center">
+          <div>
+            <span class="text-[10px] sm:text-[11px] font-bold text-[#8c8275]">當前修煉海拔</span>
+            <p id="modal-student-altitude" class="text-xl sm:text-2xl font-black text-[#3d6c8f] mt-0.5">0 m</p>
+          </div>
+          <div>
+            <span class="text-[10px] sm:text-[11px] font-bold text-[#8c8275]">累計考取證照</span>
+            <p id="modal-student-count" class="text-xl sm:text-2xl font-black text-[#4d7a42] mt-0.5">0 張</p>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-[11px] sm:text-xs font-bold text-[#706456] uppercase tracking-wider mb-2 flex items-center space-x-1">
+            <i data-lucide="award" class="w-3.5 h-3.5 text-[#b46b2b]"></i>
+            <span>已通過之證照成就</span>
+          </h4>
+          <div id="modal-student-certs" class="space-y-1.5 text-xs"></div>
+        </div>
+      </div>
 
       <div class="p-3 sm:p-4 bg-[#f4ece1] border-t border-[#ebdcc7] text-right shrink-0">
         <button onclick="closeStudentModal()" class="w-full sm:w-auto px-4 py-2 bg-[#42392f] text-white rounded-xl text-xs font-bold hover:bg-[#2c241c] transition">關閉手冊</button>
@@ -362,47 +360,6 @@
   <script>
     const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyUJjAYpBxqx7CJHAEil7-BJtnU_4D9R0MS0Cli6SeNDxLeBp60PZ-L_nCii1breC22bQ/exec";
 
-    // 核心公仔繪製函式（修復頭髮！加上齊肩短髮/瀏海與立體五官）
-    function createFigureSVG(genderType, shirtColor) {
-      if (genderType === 'female') {
-        return `
-          <svg width="24" height="42" viewBox="0 0 36 60" class="char-figure drop-shadow-md">
-            <path d="M 8,16 C 5,10 7,2 18,2 C 29,2 31,10 28,16 C 30,22 29,30 27,33 C 24,26 25,18 25,18 C 22,20 14,20 11,18 C 11,18 12,26 9,33 C 7,30 6,22 8,16 Z" fill="#18181b"/>
-            <circle cx="18" cy="17" r="10" fill="#fed7aa"/>
-            <path d="M 9,15 Q 18,18 27,15 Q 18,11 9,15 Z" fill="#18181b"/>
-            <ellipse cx="12" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
-            <ellipse cx="24" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
-            <circle cx="14" cy="16" r="1.5" fill="#18181b"/>
-            <circle cx="22" cy="16" r="1.5" fill="#18181b"/>
-            <path d="M 16,21 Q 18,23 20,21" fill="none" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>
-            <rect x="11" y="27" width="14" height="16" rx="3.5" fill="${shirtColor}"/>
-            <rect x="12" y="43" width="5" height="12" rx="1" fill="#1e293b"/>
-            <rect x="19" y="43" width="5" height="12" rx="1" fill="#1e293b"/>
-            <rect x="11.5" y="55" width="6" height="3" rx="1" fill="#ffffff"/>
-            <rect x="18.5" y="55" width="6" height="3" rx="1" fill="#ffffff"/>
-          </svg>
-        `;
-      } else {
-        return `
-          <svg width="24" height="42" viewBox="0 0 36 60" class="char-figure drop-shadow-md">
-            <path d="M 9,14 C 6,10 7,3 13,3 C 15,1 21,1 23,3 C 28,1 32,5 30,10 C 33,12 33,17 29,19 C 25,20 12,20 9,14 Z" fill="#18181b"/>
-            <circle cx="18" cy="17" r="10.5" fill="#fbd5b5"/>
-            <ellipse cx="12" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.7"/>
-            <ellipse cx="24" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.7"/>
-            <circle cx="14" cy="16" r="1.5" fill="#18181b"/>
-            <circle cx="22" cy="16" r="1.5" fill="#18181b"/>
-            <path d="M 16,21 Q 18,23 20,21" fill="none" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>
-            <rect x="11" y="27" width="14" height="16" rx="3.5" fill="${shirtColor}"/>
-            <rect x="12" y="43" width="5" height="12" rx="1" fill="#1e293b"/>
-            <rect x="19" y="43" width="5" height="12" rx="1" fill="#1e293b"/>
-            <rect x="11.5" y="55" width="6" height="3" rx="1" fill="#ffffff"/>
-            <rect x="18.5" y="55" width="6" height="3" rx="1" fill="#ffffff"/>
-          </svg>
-        `;
-      }
-    }
-
-    // 證照加分設定
     const CERT_DATABASE = [
       { id: 'c1', name: '金融市場常識與職業道德', meters: 200 },
       { id: 'c2', name: 'TBSA商務企劃初階', meters: 200 },
@@ -452,4 +409,450 @@
       if (s.includes('托福') || s.includes('雅思')) return 500;
       if (s.includes('核保') || s.includes('風險管理')) return 400;
       if (s.includes('外匯') || s.includes('授信') || s.includes('衍生性') || s.includes('高業') || s.includes('高級') || s.includes('多益') || s.includes('碳盤查') || s.includes('永續報告書')) return 350;
-      if (s
+      if (s.includes('期貨') || s.includes('投信') || s.includes('投資型') || s.includes('外幣') || s.includes('理財規劃') || s.includes('永續發展') || s.includes('AI辦公室') || s.includes('票券')) return 250;
+      return 200;
+    }
+
+    function calculateStudentAltitude(certs) {
+      if (!certs || !Array.isArray(certs) || certs.length === 0) return 0;
+      let total = 0;
+      certs.forEach(c => { total += getCertPoints(c.name); });
+      return Math.min(3952, total);
+    }
+
+    let ALL_STUDENTS = [
+      { id: "112175123", name: "葉清", grade: "112級", certs: [
+        { name: "金融市場常識與職業道德", date: "2024/11/06" }, { name: "信託業務人員", date: "2026/01/17" },
+        { name: "投信投顧業務員", date: "2026/03/03" }, { name: "TBSA商務企劃初階", date: "2025/05/29" },
+        { name: "多益", date: "2026/09/20" }
+      ]},
+      { id: "111175103", name: "呂季生", grade: "111級", certs: [
+        { name: "金融市場常識與職業道德", date: "2024/09/27" }, { name: "信託業務人員", date: "2024/08/27" },
+        { name: "銀行內控與內稽", date: "2025/05/11" }, { name: "人身保險業務員", date: "2024/12/10" },
+        { name: "財產保險業務員", date: "2025/02/26" }, { name: "投資型保險商品業務員", date: "2025/11/16" },
+        { name: "外匯人員專業能力測驗", date: "2025/07/31" }, { name: "理財規劃人員專業能力測驗", date: "2026/04/12" },
+        { name: "衍生性金融商品銷售人員資格測驗", date: "2026/01/06" }, { name: "人身保險業務員銷售外幣收付非投資型保險商品", date: "2025/03/23" },
+        { name: "永續發展基礎能力測驗", date: "2025/04/13" }, { name: "投信投顧業務員", date: "2026/02/26" }
+      ]}
+    ];
+
+    let selectedGrade = 'ALL';
+
+    const GRADE_COLORS = {
+      '111級': { badge: 'bg-[#8c6da6]', shirt: '#9b7eb5', text: 'text-[#6f4b8f]', bg: 'bg-[#f0e9f5]' },
+      '112級': { badge: 'bg-[#527e9b]', shirt: '#6593b2', text: 'text-[#396482]', bg: 'bg-[#e7f0f5]' },
+      '113級': { badge: 'bg-[#5b8753]', shirt: '#6d9c65', text: 'text-[#446d3c]', bg: 'bg-[#eaf2e8]' },
+      '114級': { badge: 'bg-[#c78b43]', shirt: '#daa059', text: 'text-[#9c6625]', bg: 'bg-[#f8ede0]' },
+      '115級': { badge: 'bg-[#b86178]', shirt: '#c9788e', text: 'text-[#8f3f54]', bg: 'bg-[#f7e8ec]' }
+    };
+
+    const DIRECTOR_QUOTES = [
+      "今天礁溪天氣不錯，大家多考一張！",
+      "爬上白木林，銀行面試不用愁！",
+      "證照就像複利一樣，越早累積威力越大！",
+      "穩住呼吸，一步一腳印登上玉山主峰！",
+      "加油！我在最高峰頂為大家搖旗吶喊！",
+      "信託、內控先拿好，大四實習任你挑！",
+      "今天多看一章，明天考場笑著出來！",
+      "山頂的風景最美，大家衝刺呀！"
+    ];
+
+    async function fetchLiveDataFromGoogleSheet(isManual = false) {
+      const syncBadge = document.getElementById('sync-status');
+      try {
+        if (isManual && syncBadge) {
+          syncBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-[#c78b43] animate-spin"></span><span>同步中</span>`;
+        }
+
+        const res = await fetch(GOOGLE_SHEET_API_URL);
+        const liveData = await res.json();
+        
+        if (Array.isArray(liveData) && liveData.length > 0) {
+          ALL_STUDENTS = liveData;
+          renderGradeSummaryCards();
+          renderTeamView();
+
+          if (syncBadge) {
+            syncBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-[#528741] animate-pulse"></span><span>已連動(${liveData.length}人)</span>`;
+          }
+          if (isManual) alert(`同步成功！已成功連動全系 ${liveData.length} 位同學最新紀錄！`);
+        }
+      } catch (err) {
+        console.warn("連動試算表失敗，已採用快取資料顯示", err);
+      }
+    }
+
+    async function fetchJiaoxiWeather() {
+      try {
+        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=24.82&longitude=121.77&current_weather=true&daily=sunrise,sunset&timezone=Asia%2FTaipei');
+        const data = await res.json();
+        if (data && data.current_weather) {
+          const temp = Math.round(data.current_weather.temperature);
+          const weatherCode = data.current_weather.weathercode;
+          const isDay = data.current_weather.is_day;
+          updateWeatherUI(temp, weatherCode, isDay);
+          updateSkyBackground(isDay, weatherCode);
+        }
+      } catch (err) {
+        applyDefaultDaySky();
+      }
+    }
+
+    function updateWeatherUI(temp, code, isDay) {
+      document.getElementById('weather-temp').innerText = `${temp}°C`;
+      const descEl = document.getElementById('weather-desc');
+      const iconEl = document.getElementById('weather-icon');
+      let desc = '晴朗';
+      let icon = isDay ? '☀️' : '🌙';
+
+      if (code >= 51 && code <= 67) {
+        desc = '飄雨';
+        icon = '🌧️';
+        showRainEffect(true);
+      } else if (code >= 1 && code <= 3) {
+        desc = '多雲';
+        icon = isDay ? '⛅' : '☁️';
+        showRainEffect(false);
+      } else if (code >= 80) {
+        desc = '陣雨';
+        icon = '🌦️';
+        showRainEffect(true);
+      } else {
+        showRainEffect(false);
+      }
+      descEl.innerText = desc;
+      iconEl.innerText = icon;
+    }
+
+    function showRainEffect(enable) {
+      const rainLayer = document.getElementById('rain-layer');
+      rainLayer.innerHTML = '';
+      if (enable) {
+        rainLayer.classList.remove('hidden');
+        for (let i = 0; i < 30; i++) {
+          const drop = document.createElement('div');
+          drop.className = 'rain-drop';
+          drop.style.left = `${Math.random() * 100}%`;
+          drop.style.animationDuration = `${0.6 + Math.random() * 0.5}s`;
+          drop.style.animationDelay = `${Math.random() * 2}s`;
+          rainLayer.appendChild(drop);
+        }
+      } else {
+        rainLayer.classList.add('hidden');
+      }
+    }
+
+    function updateSkyBackground(isDay, code) {
+      const container = document.getElementById('sky-canvas-container');
+      const celestial = document.getElementById('celestial-graphic');
+      const hour = new Date().getHours();
+
+      if (!isDay || hour < 5 || hour >= 18) {
+        // 夜間微醺深藍星空
+        container.style.background = 'linear-gradient(to bottom, #1f2839 0%, #2b394f 45%, #415570 100%)';
+        celestial.innerText = '🌙';
+        celestial.className = 'w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-[#fcedbb] shadow-[0_0_20px_rgba(252,237,187,0.7)] flex items-center justify-center text-base sm:text-xl';
+      } else if (hour >= 16 && hour < 18) {
+        // 繪本夕照金橘
+        container.style.background = 'linear-gradient(to bottom, #e8b18a 0%, #edd3ba 40%, #e2e1dc 100%)';
+        celestial.innerText = '🌇';
+      } else if (code >= 51) {
+        // 雨天柔和霧灰
+        container.style.background = 'linear-gradient(to bottom, #abb7b8 0%, #c8d3d4 50%, #e5e5de 100%)';
+        celestial.innerText = '🌧️';
+      } else {
+        applyDefaultDaySky();
+      }
+    }
+
+    function applyDefaultDaySky() {
+      const container = document.getElementById('sky-canvas-container');
+      // 柔和繪本水藍天色
+      container.style.background = 'linear-gradient(to bottom, #8ec7d2 0%, #bae2e8 45%, #edf3e4 100%)';
+    }
+
+    function startDirectorPatrol() {
+      const director = document.getElementById('director-npc');
+      const quoteEl = document.getElementById('director-quote');
+
+      // 百分比巡邏路徑節點
+      const waypoints = [
+        { x: 33, y: 78 },
+        { x: 48, y: 68 },
+        { x: 41, y: 50 },
+        { x: 59, y: 35 },
+        { x: 52, y: 17 }
+      ];
+
+      setInterval(() => {
+        const target = waypoints[Math.floor(Math.random() * waypoints.length)];
+        const jitterX = (Math.random() * 4) - 2;
+        director.style.left = `${target.x + jitterX}%`;
+        director.style.top = `${target.y}%`;
+
+        const randomQuote = DIRECTOR_QUOTES[Math.floor(Math.random() * DIRECTOR_QUOTES.length)];
+        quoteEl.innerText = randomQuote;
+      }, 14000);
+
+      director.onclick = () => {
+        const randomQuote = DIRECTOR_QUOTES[Math.floor(Math.random() * DIRECTOR_QUOTES.length)];
+        quoteEl.innerText = randomQuote;
+      };
+    }
+
+    function createFigureSVG(genderType, shirtColor) {
+      if (genderType === 'female') {
+        return `
+          <svg width="22" height="38" viewBox="0 0 36 58" class="char-figure drop-shadow-md sm:w-[26px] sm:h-[44px]">
+            <path d="M 10,16 C 6,10 8,3 18,3 C 28,3 30,10 26,16 C 29,20 28,30 25,32 C 22,25 24,18 24,18 C 22,19 14,19 12,18 C 12,18 14,25 11,32 C 8,30 7,20 10,16 Z" fill="#18181b"/>
+            <circle cx="18" cy="17" r="10" fill="#fed7aa"/>
+            <ellipse cx="12" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
+            <ellipse cx="24" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
+            <path d="M 13,15 Q 15,13 17,15" fill="none" stroke="#27272a" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M 19,15 Q 21,13 23,15" fill="none" stroke="#27272a" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M 16,21 Q 18,23 20,21" fill="none" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>
+            <rect x="12" y="27" width="12" height="15" rx="3.5" fill="${shirtColor}"/>
+            <rect x="8" y="28" width="3.5" height="11" rx="1.7" fill="#fed7aa"/>
+            <rect x="24.5" y="28" width="3.5" height="11" rx="1.7" fill="#fed7aa"/>
+            <rect x="13" y="42" width="4" height="11" rx="1" fill="#e2e8f0"/>
+            <rect x="19" y="42" width="4" height="11" rx="1" fill="#e2e8f0"/>
+            <rect x="12" y="53" width="5" height="3" rx="1" fill="#1e293b"/>
+            <rect x="19" y="53" width="5" height="3" rx="1" fill="#1e293b"/>
+          </svg>
+        `;
+      } else {
+        return `
+          <svg width="22" height="40" viewBox="0 0 36 60" class="char-figure drop-shadow-md sm:w-[26px] sm:h-[46px]">
+            <path d="M 10,14 C 7,11 8,5 13,4 C 15,1 21,1 24,3 C 28,1 33,5 31,10 C 34,12 34,17 29,19 C 25,20 12,20 10,14 Z" fill="#18181b"/>
+            <circle cx="20" cy="16" r="10.5" fill="#fbd5b5"/>
+            <ellipse cx="13" cy="18" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
+            <ellipse cx="27" cy="18" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
+            <circle cx="15" cy="15" r="1.5" fill="#18181b"/>
+            <circle cx="25" cy="15" r="1.5" fill="#18181b"/>
+            <path d="M 18,20 Q 20,22 22,20" fill="none" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>
+            <rect x="13" y="27" width="14" height="16" rx="3.5" fill="${shirtColor}"/>
+            <rect x="9" y="28" width="4" height="12" rx="2" fill="#ffffff"/>
+            <rect x="27" y="28" width="4" height="12" rx="2" fill="#ffffff"/>
+            <rect x="14" y="43" width="4.5" height="12" rx="1" fill="#1e293b"/>
+            <rect x="21.5" y="43" width="4.5" height="12" rx="1" fill="#1e293b"/>
+            <rect x="13.5" y="55" width="5" height="3" rx="1" fill="#ffffff"/>
+            <rect x="21.5" y="55" width="5" height="3" rx="1" fill="#ffffff"/>
+          </svg>
+        `;
+      }
+    }
+
+    function renderGradeSummaryCards() {
+      const container = document.getElementById('grade-summary-cards');
+      container.innerHTML = '';
+      const grades = ['ALL', '111級', '112級', '113級', '114級', '115級'];
+
+      grades.forEach(g => {
+        const list = g === 'ALL' ? ALL_STUDENTS : ALL_STUDENTS.filter(s => s.grade === g);
+        const total = list.length;
+        const certified = list.filter(s => s.certs && s.certs.length > 0).length;
+        const totalCerts = list.reduce((sum, s) => sum + (s.certs ? s.certs.length : 0), 0);
+        const isCurrent = selectedGrade === g;
+
+        const card = document.createElement('div');
+        card.className = `p-2.5 sm:p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between shrink-0 w-28 sm:w-auto ${
+          isCurrent 
+            ? 'bg-[#608058] text-white shadow-md border-[#608058] ring-2 ring-[#a3c399]' 
+            : 'bg-[#fbf7f0] text-[#4b4033] border-[#e8dccb] hover:border-[#b8a994] hover:bg-[#f4ece1]'
+        }`;
+        card.onclick = () => selectGradeFilter(g);
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-0.5 sm:mb-1">
+              <span class="font-black text-xs sm:text-sm truncate">${g === 'ALL' ? '🌟全系' : g}</span>
+              <span class="text-[9px] font-bold px-1.5 py-0.2 rounded ${isCurrent ? 'bg-white/20 text-white' : 'bg-[#eeddc8] text-[#5e4b37]'}">
+                ${total}
+              </span>
+            </div>
+            <p class="text-[9px] sm:text-[11px] ${isCurrent ? 'text-[#dbe8d5]' : 'text-[#8c8275]'}">已考: <b>${certified}人</b></p>
+          </div>
+          <div class="mt-1.5 pt-1.5 border-t ${isCurrent ? 'border-white/20' : 'border-[#ebdcc7]'} flex items-baseline justify-between text-[10px] sm:text-[11px]">
+            <span class="${isCurrent ? 'text-[#dbe8d5]' : 'text-[#8c8275]'}">總張數</span>
+            <span class="font-black text-xs sm:text-sm">${totalCerts}</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function selectGradeFilter(g) {
+      selectedGrade = g;
+      renderGradeSummaryCards();
+      renderTeamView();
+    }
+
+    function getFilteredStudents() {
+      const search = document.getElementById('team-search-input').value.trim().toLowerCase();
+      return ALL_STUDENTS.filter(s => {
+        const matchGrade = (selectedGrade === 'ALL' || s.grade === selectedGrade);
+        const matchSearch = s.name.toLowerCase().includes(search) || (s.id && s.id.toLowerCase().includes(search));
+        return matchGrade && matchSearch;
+      });
+    }
+
+    function renderTeamView() {
+      const list = getFilteredStudents();
+      const totalStudents = list.length;
+      const certifiedStudents = list.filter(s => s.certs && s.certs.length > 0).length;
+      const totalCerts = list.reduce((sum, s) => sum + (s.certs ? s.certs.length : 0), 0);
+
+      document.getElementById('current-filter-title').innerText = selectedGrade === 'ALL' ? '全體學生' : selectedGrade;
+      document.getElementById('stat-total-students').innerText = totalStudents;
+      document.getElementById('stat-certified-students').innerText = certifiedStudents;
+      document.getElementById('stat-total-certs').innerText = totalCerts;
+
+      renderTeamPins(list);
+      renderTeamRoster(list);
+    }
+
+    function renderTeamPins(list) {
+      const layer = document.getElementById('team-pins-layer');
+      layer.innerHTML = '';
+
+      list.forEach(st => {
+        const certCount = st.certs ? st.certs.length : 0;
+        const altitude = calculateStudentAltitude(st.certs);
+        const ratio = altitude / 3952;
+        
+        // 縱向高度百分比 (從島嶼基底 80% 到峰頂 16%)
+        const topPercent = 80 - ratio * (80 - 16);
+        
+        // 環島步道 S 型百分比
+        const jitterPercent = ((st.name.charCodeAt(0) * 17) % 10) - 5;
+        const basePercent = 51 + Math.sin(ratio * Math.PI * 2.3) * 16;
+        const leftPercent = Math.max(16, Math.min(84, basePercent + jitterPercent));
+
+        const conf = GRADE_COLORS[st.grade] || { badge: 'bg-[#527e9b]', shirt: '#6593b2' };
+        const isFemale = (st.name.charCodeAt(st.name.length - 1) % 2 === 0);
+        const figureHtml = createFigureSVG(isFemale ? 'female' : 'male', conf.shirt);
+
+        const pin = document.createElement('div');
+        pin.className = 'absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-full hover:scale-130 transition-transform duration-200 z-10 select-none';
+        pin.style.left = `${leftPercent}%`;
+        pin.style.top = `${topPercent}%`;
+        pin.onclick = () => openStudentModal(st);
+
+        pin.innerHTML = `
+          <div class="flex flex-col items-center">
+            <div class="px-1.5 py-0.2 rounded-full text-[8px] sm:text-[9px] font-black text-white shadow-xs whitespace-nowrap mb-0.5 ${conf.badge}">
+              ${st.name} ${certCount > 0 ? `(${certCount})` : ''}
+            </div>
+            ${figureHtml}
+          </div>
+        `;
+        layer.appendChild(pin);
+      });
+    }
+
+    function renderTeamRoster(list) {
+      const container = document.getElementById('team-roster-list');
+      container.innerHTML = '';
+
+      list.sort((a, b) => {
+        const countA = a.certs ? a.certs.length : 0;
+        const countB = b.certs ? b.certs.length : 0;
+        if (countB !== countA) return countB - countA;
+        return calculateStudentAltitude(b.certs) - calculateStudentAltitude(a.certs);
+      });
+
+      if (list.length === 0) {
+        container.innerHTML = `<div class="p-6 text-center text-xs text-[#8c8275]">查無學生資料</div>`;
+        return;
+      }
+
+      list.forEach((st, idx) => {
+        const certCount = st.certs ? st.certs.length : 0;
+        const alt = calculateStudentAltitude(st.certs);
+        const pct = Math.min(100, Math.round((alt / 3952) * 100));
+        const conf = GRADE_COLORS[st.grade] || { bg: 'bg-[#f4ece1]', text: 'text-[#5e4b37]' };
+
+        const card = document.createElement('div');
+        card.className = 'p-2.5 sm:p-3 bg-[#f4ece1]/80 border border-[#e8dccb] rounded-2xl hover:bg-[#ede1d2] hover:border-[#cfbca6] transition cursor-pointer flex flex-col gap-1.5 sm:gap-2';
+        card.onclick = () => openStudentModal(st);
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2 min-w-0">
+              <span class="w-4 text-center text-xs font-black ${idx < 3 ? 'text-[#b46b2b]' : 'text-[#9e9080]'}">${idx + 1}</span>
+              <div class="truncate">
+                <p class="text-xs font-bold text-[#3d4a39] truncate">
+                  ${st.name} 
+                  <span class="text-[9px] font-bold px-1.5 py-0.2 rounded-full ${conf.bg} ${conf.text} ml-0.5">${st.grade}</span>
+                </p>
+                <p class="text-[9px] text-[#8c8275]">學號: ${st.id || '未登記'}</p>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <span class="px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold ${
+                certCount >= 5 ? 'bg-[#e3ecd7] text-[#4d6a42]' : certCount > 0 ? 'bg-[#e7f0f5] text-[#396482]' : 'bg-[#e8dccb] text-[#706456]'
+              }">
+                ${certCount} 張
+              </span>
+              <p class="text-[9px] sm:text-[10px] text-[#b46b2b] font-bold mt-0.5">${alt.toLocaleString()} m</p>
+            </div>
+          </div>
+          <div class="w-full bg-[#ded0bf] h-1 sm:h-1.5 rounded-full overflow-hidden">
+            <div class="bg-gradient-to-r from-[#c78b43] to-[#5b8753] h-full rounded-full" style="width: ${pct}%"></div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function openStudentModal(student) {
+      const modal = document.getElementById('student-modal');
+      const certCount = student.certs ? student.certs.length : 0;
+      const altitude = calculateStudentAltitude(student.certs);
+
+      document.getElementById('modal-student-name').innerText = student.name;
+      document.getElementById('modal-student-grade').innerText = student.grade || '未設定';
+      document.getElementById('modal-student-id').innerText = `學號：${student.id || '未設定'}`;
+      document.getElementById('modal-student-altitude').innerText = `${altitude.toLocaleString()} m`;
+      document.getElementById('modal-student-count').innerText = `${certCount} 張`;
+
+      const certsContainer = document.getElementById('modal-student-certs');
+      certsContainer.innerHTML = '';
+
+      if (certCount === 0) {
+        certsContainer.innerHTML = `<div class="p-5 text-center text-[#8c8275] bg-[#f4ece1] rounded-xl text-xs">尚無考取紀錄，在島嶼登山口整裝待發！</div>`;
+      } else {
+        student.certs.forEach(c => {
+          const meters = getCertPoints(c.name);
+          const item = document.createElement('div');
+          item.className = 'p-2 bg-[#fbf7f0] rounded-xl border border-[#ebdcc7] flex items-center justify-between shadow-2xs';
+          item.innerHTML = `
+            <div class="min-w-0 pr-2">
+              <p class="font-bold text-[#3d4a39] truncate text-xs">${c.name}</p>
+              <p class="text-[9px] text-[#8c8275]">考取日期：${c.date || '無紀錄'}</p>
+            </div>
+            <span class="px-1.5 py-0.5 bg-[#eeddc8] text-[#7d5c34] font-black rounded-lg text-[9px] whitespace-nowrap">+${meters}m</span>
+          `;
+          certsContainer.appendChild(item);
+        });
+      }
+
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeStudentModal() {
+      document.getElementById('student-modal').classList.add('hidden');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderGradeSummaryCards();
+      renderTeamView();
+      fetchJiaoxiWeather();
+      startDirectorPatrol();
+      lucide.createIcons();
+      fetchLiveDataFromGoogleSheet();
+    });
+  </script>
+</body>
+</html>
