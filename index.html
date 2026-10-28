@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>經濟百岳全景群島生態・FGU DAE</title>
+  <title>經濟百岳試煉島・FGU DAE</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
@@ -68,7 +68,7 @@
             經濟百岳群島大平原
             <span class="text-[9px] sm:text-xs font-bold px-2 py-0.5 bg-[#e3ecd7] text-[#4d6a42] rounded-full shrink-0">全島同屏航海版</span>
           </h1>
-          <p class="text-[10px] sm:text-xs text-[#8c8275] truncate">佛光大學應用經濟學系・等角全景微縮生態</p>
+          <p class="text-[10px] sm:text-xs text-[#8c8275] truncate">佛光大學應用經濟學系</p>
         </div>
       </div>
 
@@ -214,10 +214,10 @@
                 <ellipse cx="260" cy="225" rx="145" ry="50" fill="#68935a"/>
                 <circle cx="210" cy="210" r="10" fill="#4a3322"/>
                 <circle cx="210" cy="208" r="5" fill="#f97316" class="campfire-glow"/>
-                <text x="180" y="190" font-size="10" font-weight="900" fill="#26401f">⛺ 信託營火</text>
+                <text x="180" y="190" font-size="10" font-weight="900" fill="#26401f">⛺ 銀行證券期貨營火</text>
                 <circle cx="310" cy="210" r="10" fill="#4a3322"/>
                 <circle cx="310" cy="208" r="5" fill="#f97316" class="campfire-glow"/>
-                <text x="280" y="190" font-size="10" font-weight="900" fill="#26401f">📜 證券書閣</text>
+                <text x="280" y="190" font-size="10" font-weight="900" fill="#26401f">📜 保險書閣</text>
                 <circle cx="260" cy="245" r="10" fill="#4a3322"/>
                 <circle cx="260" cy="243" r="5" fill="#f97316" class="campfire-glow"/>
                 <text x="235" y="268" font-size="10" font-weight="900" fill="#26401f">🤖 AI研習亭</text>
@@ -362,523 +362,94 @@
   <script>
     const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyUJjAYpBxqx7CJHAEil7-BJtnU_4D9R0MS0Cli6SeNDxLeBp60PZ-L_nCii1breC22bQ/exec";
 
-    // 關鍵修復：預設為空陣列！沒有人填就完全不顯示任何人
-    let TRAINING_STUDENTS = [];
-    let TRIAL_STUDENTS = [];
-
-    // 縮放與平移引擎
-    let stageScale = 1;
-    let stagePanX = 0;
-    let stagePanY = 0;
-    let isDragging = false;
-    let startX = 0, startY = 0;
-
-    const viewport = document.getElementById('sky-canvas-container');
-    const stage = document.getElementById('island-pan-zoom-stage');
-
-    function applyStageTransform() {
-      stage.style.transform = `translate(${stagePanX}px, ${stagePanY}px) scale(${stageScale})`;
-    }
-
-    function resetStageTransform() {
-      const vpWidth = viewport.clientWidth;
-      const vpHeight = viewport.clientHeight;
-      stageScale = Math.min(vpWidth / 1400, vpHeight / 800) * 1.1;
-      stagePanX = (vpWidth - 1400 * stageScale) / 2;
-      stagePanY = (vpHeight - 800 * stageScale) / 2;
-      applyStageTransform();
-    }
-
-    viewport.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      startX = e.clientX - stagePanX;
-      startY = e.clientY - stagePanY;
-      viewport.classList.remove('viewport-grab');
-      viewport.classList.add('viewport-grabbing');
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      stagePanX = e.clientX - startX;
-      stagePanY = e.clientY - startY;
-      applyStageTransform();
-    });
-
-    window.addEventListener('mouseup', () => {
-      isDragging = false;
-      viewport.classList.remove('viewport-grabbing');
-      viewport.classList.add('viewport-grab');
-    });
-
-    viewport.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
-      const newScale = Math.max(0.4, Math.min(2.5, stageScale * zoomFactor));
-      const rect = viewport.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-      stagePanX = mouseX - (mouseX - stagePanX) * (newScale / stageScale);
-      stagePanY = mouseY - (mouseY - stagePanY) * (newScale / stageScale);
-      stageScale = newScale;
-      applyStageTransform();
-    }, { passive: false });
-
-    let touchStartX = 0, touchStartY = 0;
-    viewport.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 1) {
-        touchStartX = e.touches[0].clientX - stagePanX;
-        touchStartY = e.touches[0].clientY - stagePanY;
-      }
-    });
-
-    viewport.addEventListener('touchmove', (e) => {
-      if (e.touches.length === 1) {
-        stagePanX = e.touches[0].clientX - touchStartX;
-        stagePanY = e.touches[0].clientY - touchStartY;
-        applyStageTransform();
-      }
-    });
-
-    function focusIsland(islandKey) {
-      const vpWidth = viewport.clientWidth;
-      const vpHeight = viewport.clientHeight;
-      const targets = {
-        overview: { x: 700, y: 400, scale: Math.min(vpWidth / 1400, vpHeight / 800) },
-        main: { x: 700, y: 400, scale: 1.15 },
-        training: { x: 260, y: 260, scale: 1.35 },
-        trial: { x: 1120, y: 240, scale: 1.35 },
-        port: { x: 1180, y: 580, scale: 1.35 }
-      };
-
-      const t = targets[islandKey] || targets.main;
-      stageScale = t.scale;
-      stagePanX = (vpWidth / 2) - (t.x * stageScale);
-      stagePanY = (vpHeight / 2) - (t.y * stageScale);
-      applyStageTransform();
-
-      document.querySelectorAll('#btn-focus-overview, #btn-focus-main, #btn-focus-training, #btn-focus-trial, #btn-focus-port').forEach(btn => {
-        btn.className = 'flex-1 min-w-[90px] py-1.5 px-2.5 rounded-xl font-bold text-xs flex items-center justify-center space-x-1 transition-all text-[#6d5b45] hover:bg-[#ede1d2]';
-      });
-      const activeBtn = document.getElementById(`btn-focus-${islandKey}`);
-      if (activeBtn) activeBtn.className = 'flex-1 min-w-[90px] py-1.5 px-2.5 rounded-xl font-black text-xs flex items-center justify-center space-x-1 transition-all bg-[#608058] text-white shadow-xs';
-    }
-
-    const balloonViews = ['main', 'training', 'trial', 'port'];
-    let currentBalloonIndex = 0;
-    function triggerBalloonViewSwitch() {
-      currentBalloonIndex = (currentBalloonIndex + 1) % balloonViews.length;
-      focusIsland(balloonViews[currentBalloonIndex]);
-    }
-
-    function isTargetDateExpired(dateStr) {
-      if (!dateStr) return false;
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
-      const parts = dateStr.replace(/-/g, '/').split('/');
-      let year = parseInt(parts[0], 10);
-      let month = parseInt(parts[1], 10);
-      let day = parts[2] ? parseInt(parts[2], 10) : new Date(year, month, 0).getDate();
-      const target = new Date(year, month - 1, day, 23, 59, 59);
-      return now > target;
-    }
-
-    function getDaysRemaining(dateStr) {
-      if (!dateStr) return null;
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
-      const parts = dateStr.replace(/-/g, '/').split('/');
-      let year = parseInt(parts[0], 10);
-      let month = parseInt(parts[1], 10);
-      let day = parts[2] ? parseInt(parts[2], 10) : new Date(year, month, 0).getDate();
-      const target = new Date(year, month - 1, day);
-      return Math.ceil((target - now) / (1000 * 60 * 60 * 24));
-    }
-
-    function renderAllLayers() {
-      const search = (document.getElementById('team-search-input').value || '').trim().toLowerCase();
-      const layer = document.getElementById('island-pins-layer');
-      layer.innerHTML = '';
-
-      // 1. 百岳主島學生
-      const climbStudents = ALL_STUDENTS.filter(s => {
-        const matchGrade = (selectedGrade === 'ALL' || s.grade === selectedGrade);
-        const matchSearch = s.name.toLowerCase().includes(search) || (s.id && s.id.toLowerCase().includes(search));
-        return matchGrade && matchSearch;
-      });
-
-      climbStudents.forEach(st => {
-        const certCount = st.certs ? st.certs.length : 0;
-        const altitude = calculateStudentAltitude(st.certs);
-        const ratio = altitude / 3952;
-
-        const topY = 460 - ratio * (460 - 110);
-        const baseX = 700 + Math.sin(ratio * Math.PI * 2.3) * 110;
-        const jitter = ((st.name.charCodeAt(0) * 19) % 50) - 25;
-        const leftX = baseX + jitter;
-
-        const conf = GRADE_COLORS[st.grade] || { badge: 'bg-[#527e9b]', shirt: '#6593b2' };
-        const isFemale = (st.name.charCodeAt(st.name.length - 1) % 2 === 0);
-
-        const pin = document.createElement('div');
-        pin.className = 'absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-full hover:scale-130 transition-transform duration-200 z-10 select-none';
-        pin.style.left = `${leftX}px`;
-        pin.style.top = `${topY}px`;
-        pin.onclick = () => openClimbStudentModal(st);
-
-        pin.innerHTML = `
-          <div class="flex flex-col items-center">
-            <div class="px-1.5 py-0.2 rounded-full text-[9px] font-black text-white shadow-xs whitespace-nowrap mb-0.5 ${conf.badge}">
-              ${st.name} ${certCount > 0 ? `(${certCount})` : ''}
-            </div>
-            ${createFigureSVG(isFemale ? 'female' : 'male', conf.shirt)}
-          </div>
+    // 核心公仔繪製函式（修復頭髮！加上齊肩短髮/瀏海與立體五官）
+    function createFigureSVG(genderType, shirtColor) {
+      if (genderType === 'female') {
+        return `
+          <svg width="24" height="42" viewBox="0 0 36 60" class="char-figure drop-shadow-md">
+            <path d="M 8,16 C 5,10 7,2 18,2 C 29,2 31,10 28,16 C 30,22 29,30 27,33 C 24,26 25,18 25,18 C 22,20 14,20 11,18 C 11,18 12,26 9,33 C 7,30 6,22 8,16 Z" fill="#18181b"/>
+            <circle cx="18" cy="17" r="10" fill="#fed7aa"/>
+            <path d="M 9,15 Q 18,18 27,15 Q 18,11 9,15 Z" fill="#18181b"/>
+            <ellipse cx="12" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
+            <ellipse cx="24" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.8"/>
+            <circle cx="14" cy="16" r="1.5" fill="#18181b"/>
+            <circle cx="22" cy="16" r="1.5" fill="#18181b"/>
+            <path d="M 16,21 Q 18,23 20,21" fill="none" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>
+            <rect x="11" y="27" width="14" height="16" rx="3.5" fill="${shirtColor}"/>
+            <rect x="12" y="43" width="5" height="12" rx="1" fill="#1e293b"/>
+            <rect x="19" y="43" width="5" height="12" rx="1" fill="#1e293b"/>
+            <rect x="11.5" y="55" width="6" height="3" rx="1" fill="#ffffff"/>
+            <rect x="18.5" y="55" width="6" height="3" rx="1" fill="#ffffff"/>
+          </svg>
         `;
-        layer.appendChild(pin);
-      });
-
-      // 2. 備考練功島學生 (過期不列出)
-      const validTraining = TRAINING_STUDENTS.filter(s => !isTargetDateExpired(s.targetDate) && s.name.toLowerCase().includes(search));
-      document.getElementById('stat-training-count').innerText = validTraining.length;
-
-      validTraining.forEach((st, idx) => {
-        let posX = 210, posY = 220;
-        if (st.targetCert.includes('證券') || st.targetCert.includes('期貨')) { posX = 310; posY = 220; }
-        else if (st.targetCert.includes('AI') || st.targetCert.includes('商務')) { posX = 260; posY = 255; }
-        
-        const pin = document.createElement('div');
-        pin.className = 'absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-full hover:scale-130 transition-transform duration-200 z-10 select-none';
-        pin.style.left = `${posX + (idx * 12 % 24) - 12}px`;
-        pin.style.top = `${posY + (idx * 8 % 16) - 8}px`;
-        pin.onclick = () => openTrainingModal(st);
-
-        const days = getDaysRemaining(st.targetDate);
-        const isFemale = (st.name.charCodeAt(st.name.length - 1) % 2 === 0);
-
-        pin.innerHTML = `
-          <div class="flex flex-col items-center">
-            <div class="px-1.5 py-0.2 rounded-full text-[9px] font-black text-white shadow-xs whitespace-nowrap mb-0.5 bg-amber-600">
-              ${st.name}・${days !== null ? `剩${days}天` : '備戰'}
-            </div>
-            ${createFigureSVG(isFemale ? 'female' : 'male', '#d97706')}
-          </div>
-        `;
-        layer.appendChild(pin);
-      });
-
-      // 3. 實戰試煉島學生
-      const trialStudents = TRIAL_STUDENTS.filter(s => s.name.toLowerCase().includes(search));
-      document.getElementById('stat-trial-count').innerText = trialStudents.length;
-
-      trialStudents.forEach((st, idx) => {
-        let posX = 1050, posY = 185;
-        if (st.sector === '證券') { posX = 1190; posY = 180; }
-        else if (st.sector === '保險') { posX = 1060; posY = 235; }
-        else if (st.sector === '期貨') { posX = 1185; posY = 235; }
-
-        const pin = document.createElement('div');
-        pin.className = 'absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-full hover:scale-130 transition-transform duration-200 z-10 select-none';
-        pin.style.left = `${posX + (idx * 14 % 20) - 10}px`;
-        pin.style.top = `${posY + (idx * 8 % 12) - 6}px`;
-        pin.onclick = () => openTrialStudentModal(st);
-
-        const isFemale = (st.name.charCodeAt(st.name.length - 1) % 2 === 0);
-        pin.innerHTML = `
-          <div class="flex flex-col items-center">
-            <div class="px-1.5 py-0.2 rounded-full text-[9px] font-black text-white shadow-xs whitespace-nowrap mb-0.5 bg-blue-600">
-              ${st.name}・${st.sector}
-            </div>
-            ${createFigureSVG(isFemale ? 'female' : 'male', '#2563eb')}
-          </div>
-        `;
-        layer.appendChild(pin);
-      });
-
-      document.getElementById('stat-certified-students').innerText = climbStudents.filter(s => s.certs && s.certs.length > 0).length;
-      document.getElementById('stat-total-certs').innerText = climbStudents.reduce((sum, s) => sum + (s.certs ? s.certs.length : 0), 0);
-
-      renderActiveRoster();
-    }
-
-    function switchRosterTab(tab) {
-      currentRosterTab = tab;
-      document.querySelectorAll('#tab-roster-climb, #tab-roster-training, #tab-roster-trial').forEach(b => {
-        b.className = 'px-2 py-0.5 rounded font-bold bg-[#ede1d2] text-[#6d5b45]';
-      });
-      document.getElementById(`tab-roster-${tab}`).className = 'px-2 py-0.5 rounded font-black bg-[#608058] text-white';
-      
-      const titles = {
-        climb: '百岳考照榮譽榜',
-        training: '備考同伴研討榜 (有效考期)',
-        trial: '職場實習體驗榜'
-      };
-      document.getElementById('roster-panel-title').innerText = titles[tab];
-      renderActiveRoster();
-    }
-
-    function renderActiveRoster() {
-      const container = document.getElementById('active-roster-list');
-      container.innerHTML = '';
-
-      if (currentRosterTab === 'climb') {
-        const list = [...ALL_STUDENTS].sort((a, b) => (b.certs ? b.certs.length : 0) - (a.certs ? a.certs.length : 0));
-        list.forEach((st, idx) => {
-          const certCount = st.certs ? st.certs.length : 0;
-          const alt = calculateStudentAltitude(st.certs);
-          const pct = Math.min(100, Math.round((alt / 3952) * 100));
-
-          const card = document.createElement('div');
-          card.className = 'p-2.5 bg-[#f4ece1]/80 border border-[#e8dccb] rounded-2xl hover:bg-[#ede1d2] transition cursor-pointer flex flex-col gap-1.5';
-          card.onclick = () => openClimbStudentModal(st);
-          card.innerHTML = `
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-2">
-                <span class="w-4 text-center text-xs font-black ${idx < 3 ? 'text-[#b46b2b]' : 'text-[#9e9080]'}">${idx + 1}</span>
-                <p class="text-xs font-bold text-[#3d4a39]">${st.name} <span class="text-[9px] text-[#8c8275]">(${st.grade})</span></p>
-              </div>
-              <span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-[#e3ecd7] text-[#4d6a42]">${certCount} 張・${alt}m</span>
-            </div>
-            <div class="w-full bg-[#ded0bf] h-1 rounded-full overflow-hidden">
-              <div class="bg-gradient-to-r from-[#c78b43] to-[#5b8753] h-full" style="width: ${pct}%"></div>
-            </div>
-          `;
-          container.appendChild(card);
-        });
-      } else if (currentRosterTab === 'training') {
-        const validList = TRAINING_STUDENTS.filter(s => !isTargetDateExpired(s.targetDate));
-        if (validList.length === 0) {
-          container.innerHTML = `<p class="p-8 text-center text-xs text-[#8c8275] bg-white rounded-2xl border border-amber-100/60">目前尚無同學登記備考，快來登記第一個！</p>`;
-          return;
-        }
-        validList.forEach(st => {
-          const days = getDaysRemaining(st.targetDate);
-          const card = document.createElement('div');
-          card.className = 'p-2.5 bg-white border border-amber-100 rounded-2xl hover:border-amber-300 transition cursor-pointer flex flex-col gap-1';
-          card.onclick = () => openTrainingModal(st);
-          card.innerHTML = `
-            <div class="flex items-center justify-between">
-              <p class="text-xs font-bold text-slate-800">${st.name} <span class="text-[10px] text-amber-700 font-bold ml-1">${st.targetCert}</span></p>
-              <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">${days !== null ? `剩 ${days} 天` : '衝刺'}</span>
-            </div>
-            <p class="text-[10px] text-slate-500 truncate italic">“${st.location || '研討刷題中'}”</p>
-          `;
-          container.appendChild(card);
-        });
-      } else if (currentRosterTab === 'trial') {
-        if (TRIAL_STUDENTS.length === 0) {
-          container.innerHTML = `<p class="p-8 text-center text-xs text-[#8c8275] bg-white rounded-2xl border border-amber-100/60">目前尚無職場體驗實習名冊登記</p>`;
-          return;
-        }
-        TRIAL_STUDENTS.forEach(st => {
-          const card = document.createElement('div');
-          card.className = 'p-2.5 bg-white border border-amber-100 rounded-2xl hover:border-amber-300 transition cursor-pointer flex flex-col gap-1';
-          card.onclick = () => openTrialStudentModal(st);
-          card.innerHTML = `
-            <div class="flex items-center justify-between">
-              <p class="text-xs font-bold text-slate-800">${st.name} <span class="text-[10px] text-blue-600 font-bold ml-1">${st.sector}</span></p>
-              <span class="text-[9px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">${st.role || '實習生'}</span>
-            </div>
-            <p class="text-[10px] text-slate-500 truncate">${st.company}</p>
-          `;
-          container.appendChild(card);
-        });
-      }
-    }
-
-    let directorWaypointIdx = 0;
-    function startDirectorPatrol() {
-      const director = document.getElementById('director-npc');
-      const quoteEl = document.getElementById('director-quote');
-
-      setInterval(() => {
-        directorWaypointIdx = (directorWaypointIdx + 1) % DIRECTOR_PATROL_WAYPOINTS.length;
-        const pt = DIRECTOR_PATROL_WAYPOINTS[directorWaypointIdx];
-        director.style.left = `${pt.x}px`;
-        director.style.top = `${pt.y}px`;
-        quoteEl.innerText = pt.quote;
-      }, 15000);
-    }
-
-    function openClimbStudentModal(st) {
-      const modal = document.getElementById('student-modal');
-      const certCount = st.certs ? st.certs.length : 0;
-      const alt = calculateStudentAltitude(st.certs);
-
-      document.getElementById('modal-avatar-box').innerText = '🧗';
-      document.getElementById('modal-student-name').innerText = st.name;
-      document.getElementById('modal-student-grade').innerText = `${st.grade}・玉山主島修煉`;
-      document.getElementById('modal-student-id').innerText = `學號：${st.id}`;
-
-      const content = document.getElementById('modal-body-content');
-      content.innerHTML = `
-        <div class="grid grid-cols-2 gap-2 bg-[#f2e7d8]/60 p-3 rounded-2xl border border-[#ded0bf] text-center">
-          <div><span class="text-[10px] text-[#8c8275]">攀登海拔</span><p class="text-xl font-black text-[#3d6c8f]">${alt.toLocaleString()} m</p></div>
-          <div><span class="text-[10px] text-[#8c8275]">考取證照</span><p class="text-xl font-black text-[#4d7a42]">${certCount} 張</p></div>
-        </div>
-        <div class="space-y-1.5 max-h-52 overflow-y-auto custom-scroll" id="modal-certs-list"></div>
-      `;
-
-      const listEl = document.getElementById('modal-certs-list');
-      if (certCount === 0) {
-        listEl.innerHTML = `<p class="p-3 bg-white rounded-xl text-center text-xs text-slate-400">登山口蓄勢待發</p>`;
       } else {
-        st.certs.forEach(c => {
-          listEl.innerHTML += `
-            <div class="p-2 bg-white rounded-xl border border-[#ebdcc7] flex justify-between items-center text-xs">
-              <span class="font-bold text-slate-700 truncate">${c.name}</span>
-              <span class="px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 font-bold">+${getCertPoints(c.name)}m</span>
-            </div>
-          `;
-        });
-      }
-      modal.classList.remove('hidden');
-      lucide.createIcons();
-    }
-
-    function openTrainingModal(st) {
-      const modal = document.getElementById('student-modal');
-      const days = getDaysRemaining(st.targetDate);
-
-      document.getElementById('modal-avatar-box').innerText = '🔥';
-      document.getElementById('modal-student-name').innerText = st.name;
-      document.getElementById('modal-student-grade').innerText = `${st.grade}・熱烈備戰中`;
-      document.getElementById('modal-student-id').innerText = `學號：${st.id}`;
-
-      document.getElementById('modal-body-content').innerHTML = `
-        <div class="bg-white p-4 rounded-2xl border border-amber-100 space-y-2.5 shadow-2xs text-xs">
-          <div><span class="text-[10px] font-bold text-slate-400 uppercase">目標攻克證照</span><p class="font-bold text-sm text-amber-700 mt-0.5">${st.targetCert}</p></div>
-          <div class="flex justify-between items-baseline pt-1 border-t border-slate-100">
-            <div><span class="text-[10px] font-bold text-slate-400 uppercase">預計考期</span><p class="font-bold text-slate-700 mt-0.5">${st.targetDate}</p></div>
-            <span class="px-2.5 py-1 bg-amber-100 text-amber-800 font-black rounded-lg text-xs">${days !== null ? `倒數 ${days} 天` : '衝刺中'}</span>
-          </div>
-        </div>
-        <div class="bg-amber-50/70 p-4 rounded-2xl border border-amber-200/70 text-xs">
-          <h5 class="font-bold text-amber-900 mb-1 flex items-center space-x-1"><span>📍</span><span>常駐研習地點與揪團備忘</span></h5>
-          <p class="text-amber-800 leading-relaxed italic">“${st.location || '歡迎同路人隨時相約系圖書館或自習室研討刷題！'}”</p>
-        </div>
-      `;
-      modal.classList.remove('hidden');
-    }
-
-    function openTrialStudentModal(st) {
-      const modal = document.getElementById('student-modal');
-      document.getElementById('modal-avatar-box').innerText = '💼';
-      document.getElementById('modal-student-name').innerText = st.name;
-      document.getElementById('modal-student-grade').innerText = `${st.grade}・${st.sector}試煉中`;
-      document.getElementById('modal-student-id').innerText = `學號：${st.id}`;
-
-      document.getElementById('modal-body-content').innerHTML = `
-        <div class="bg-white p-4 rounded-2xl border border-amber-100 space-y-2.5 shadow-2xs text-xs">
-          <div><span class="text-[10px] font-bold text-slate-400 uppercase">職場實習機構</span><p class="font-bold text-sm text-slate-800 mt-0.5">${st.company}</p></div>
-          <div><span class="text-[10px] font-bold text-slate-400 uppercase">實習參與職務</span><p class="font-bold text-slate-700 mt-0.5">${st.role || '實習生'}</p></div>
-          ${st.period ? `<div><span class="text-[10px] font-bold text-slate-400 uppercase">實習期間</span><p class="font-medium text-slate-600 mt-0.5">${st.period}</p></div>` : ''}
-        </div>
-        <div class="bg-amber-50/60 p-4 rounded-2xl border border-amber-200/60 text-xs">
-          <h5 class="font-bold text-amber-900 mb-1 flex items-center space-x-1"><span>💬</span><span>學長姐實戰心得與心法</span></h5>
-          <p class="text-amber-800 leading-relaxed italic">“${st.quote || '用心體驗職場，提早累積專業實力！'}”</p>
-        </div>
-      `;
-      modal.classList.remove('hidden');
-    }
-
-    function closeStudentModal() {
-      document.getElementById('student-modal').classList.add('hidden');
-    }
-
-    // 關鍵更新：以 Google 試算表實際資料為準，即使為空也直接同步為空
-    async function fetchLiveDataFromGoogleSheet(isManual = false) {
-      try {
-        const res = await fetch(GOOGLE_SHEET_API_URL);
-        const liveData = await res.json();
-        
-        if (liveData && typeof liveData === 'object') {
-          if (Array.isArray(liveData.climb)) ALL_STUDENTS = liveData.climb;
-          // 以試算表實際回傳為準，空的就是 []
-          TRAINING_STUDENTS = Array.isArray(liveData.training) ? liveData.training : [];
-          TRIAL_STUDENTS = Array.isArray(liveData.trial) ? liveData.trial : [];
-        } else if (Array.isArray(liveData)) {
-          ALL_STUDENTS = liveData;
-          TRAINING_STUDENTS = [];
-          TRIAL_STUDENTS = [];
-        }
-
-        renderGradeSummaryCards();
-        renderAllLayers();
-        if (isManual) alert(`同步成功！已成功連動全系最新資料！`);
-      } catch (err) {
-        console.warn("無法取得遠端試算表資料");
-      }
-    }
-
-    async function fetchJiaoxiWeather() {
-      try {
-        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=24.82&longitude=121.77&current_weather=true&timezone=Asia%2FTaipei');
-        const data = await res.json();
-        if (data && data.current_weather) {
-          const temp = Math.round(data.current_weather.temperature);
-          const isDay = data.current_weather.is_day;
-          document.getElementById('weather-temp').innerText = `${temp}°C`;
-          document.getElementById('weather-desc').innerText = isDay ? '礁溪晴朗' : '礁溪星空';
-          document.getElementById('weather-icon').innerText = isDay ? '☀️' : '🌙';
-          const container = document.getElementById('sky-canvas-container');
-          const celestial = document.getElementById('celestial-graphic');
-          if (!isDay) {
-            container.style.background = 'linear-gradient(to bottom, #1f2839 0%, #2b394f 45%, #415570 100%)';
-            celestial.innerText = '🌙';
-          } else {
-            container.style.background = 'linear-gradient(to bottom, #8ec7d2 0%, #bae2e8 45%, #edf3e4 100%)';
-          }
-        }
-      } catch (e) {}
-    }
-
-    function renderGradeSummaryCards() {
-      const container = document.getElementById('grade-summary-cards');
-      container.innerHTML = '';
-      const grades = ['ALL', '111級', '112級', '113級', '114級', '115級'];
-
-      grades.forEach(g => {
-        const list = g === 'ALL' ? ALL_STUDENTS : ALL_STUDENTS.filter(s => s.grade === g);
-        const total = list.length;
-        const certified = list.filter(s => s.certs && s.certs.length > 0).length;
-        const totalCerts = list.reduce((sum, s) => sum + (s.certs ? s.certs.length : 0), 0);
-        const isCurrent = selectedGrade === g;
-
-        const card = document.createElement('div');
-        card.className = `p-2.5 sm:p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between shrink-0 w-28 sm:w-auto ${
-          isCurrent ? 'bg-[#608058] text-white shadow-md border-[#608058]' : 'bg-[#fbf7f0] text-[#4b4033] border-[#e8dccb]'
-        }`;
-        card.onclick = () => { selectedGrade = g; renderGradeSummaryCards(); renderAllLayers(); };
-
-        card.innerHTML = `
-          <div>
-            <div class="flex items-center justify-between mb-0.5 sm:mb-1">
-              <span class="font-black text-xs sm:text-sm truncate">${g === 'ALL' ? '🌟全系' : g}</span>
-              <span class="text-[9px] font-bold px-1.5 py-0.2 rounded ${isCurrent ? 'bg-white/20 text-white' : 'bg-[#eeddc8] text-[#5e4b37]'}">${total}</span>
-            </div>
-            <p class="text-[9px] sm:text-[11px] ${isCurrent ? 'text-[#dbe8d5]' : 'text-[#8c8275]'}">已考: <b>${certified}人</b></p>
-          </div>
-          <div class="mt-1.5 pt-1.5 border-t ${isCurrent ? 'border-white/20' : 'border-[#ebdcc7]'} flex items-baseline justify-between text-[10px] sm:text-[11px]">
-            <span class="${isCurrent ? 'text-[#dbe8d5]' : 'text-[#8c8275]'}">總張數</span>
-            <span class="font-black text-xs sm:text-sm">${totalCerts}</span>
-          </div>
+        return `
+          <svg width="24" height="42" viewBox="0 0 36 60" class="char-figure drop-shadow-md">
+            <path d="M 9,14 C 6,10 7,3 13,3 C 15,1 21,1 23,3 C 28,1 32,5 30,10 C 33,12 33,17 29,19 C 25,20 12,20 9,14 Z" fill="#18181b"/>
+            <circle cx="18" cy="17" r="10.5" fill="#fbd5b5"/>
+            <ellipse cx="12" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.7"/>
+            <ellipse cx="24" cy="19" rx="2" ry="1.2" fill="#f87171" opacity="0.7"/>
+            <circle cx="14" cy="16" r="1.5" fill="#18181b"/>
+            <circle cx="22" cy="16" r="1.5" fill="#18181b"/>
+            <path d="M 16,21 Q 18,23 20,21" fill="none" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>
+            <rect x="11" y="27" width="14" height="16" rx="3.5" fill="${shirtColor}"/>
+            <rect x="12" y="43" width="5" height="12" rx="1" fill="#1e293b"/>
+            <rect x="19" y="43" width="5" height="12" rx="1" fill="#1e293b"/>
+            <rect x="11.5" y="55" width="6" height="3" rx="1" fill="#ffffff"/>
+            <rect x="18.5" y="55" width="6" height="3" rx="1" fill="#ffffff"/>
+          </svg>
         `;
-        container.appendChild(card);
-      });
+      }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      resetStageTransform();
-      renderGradeSummaryCards();
-      renderAllLayers();
-      fetchJiaoxiWeather();
-      startDirectorPatrol();
-      fetchLiveDataFromGoogleSheet();
-      lucide.createIcons();
-    });
+    // 證照加分設定
+    const CERT_DATABASE = [
+      { id: 'c1', name: '金融市場常識與職業道德', meters: 200 },
+      { id: 'c2', name: 'TBSA商務企劃初階', meters: 200 },
+      { id: 'c3', name: '生成式AI', meters: 200 },
+      { id: 'c4', name: '生成式AI辦公室應用能力認證', meters: 250 },
+      { id: 'c5', name: '永續發展基礎能力測驗', meters: 250 },
+      { id: 'c6', name: '企業化永續管理師合格證書-碳盤查', meters: 350 },
+      { id: 'c7', name: '企業化永續管理師合格證書-永續報告書', meters: 350 },
+      { id: 'b1', name: '信託業務人員', meters: 200 },
+      { id: 'b2', name: '銀行內控與內稽', meters: 200 },
+      { id: 'b3', name: '票券商業務人員', meters: 250 },
+      { id: 'b4', name: '初階授信人員專業能力測驗', meters: 300 },
+      { id: 'b5', name: '初階外匯人員專業能力測驗', meters: 300 },
+      { id: 'b6', name: '外匯交易專業能力測驗', meters: 350 },
+      { id: 'b7', name: '理財規劃人員專業能力測驗', meters: 300 },
+      { id: 'b8', name: '金融人員風險管理專業能力測驗', meters: 400 },
+      { id: 'b9', name: '金融人員授信擔保品估價專業能力測驗', meters: 350 },
+      { id: 'b10', name: '債權委外催收測驗', meters: 200 },
+      { id: 's1', name: '證券商業務人員', meters: 200 },
+      { id: 's2', name: '證券商高級業務人員', meters: 350 },
+      { id: 's3', name: '期貨商業務員', meters: 250 },
+      { id: 's4', name: '投信投顧業務員', meters: 250 },
+      { id: 's5', name: '投信投顧法規乙科', meters: 200 },
+      { id: 's6', name: '衍生性金融商品銷售人員資格測驗', meters: 350 },
+      { id: 's7', name: '企業內部控制', meters: 200 },
+      { id: 's8', name: '債券人員', meters: 300 },
+      { id: 's9', name: '資產證券化', meters: 300 },
+      { id: 's10', name: '證券投資分析人員', meters: 800 },
+      { id: 's11', name: '期貨交易分析人員', meters: 800 },
+      { id: 'i1', name: '人身保險業務員', meters: 200 },
+      { id: 'i2', name: '財產保險業務員', meters: 200 },
+      { id: 'i3', name: '投資型保險商品業務員', meters: 250 },
+      { id: 'i4', name: '人身保險業務員銷售外幣收付非投資型保險商品', meters: 250 },
+      { id: 'i5', name: '人壽保險核保理賠人員', meters: 400 },
+      { id: 'i6', name: '財產保險核保理賠人員', meters: 400 },
+      { id: 'l1', name: '多益', meters: 300 },
+      { id: 'l2', name: '托福', meters: 500 },
+      { id: 'l3', name: '雅思', meters: 500 }
+    ];
 
-    window.addEventListener('resize', () => {
-      resetStageTransform();
-    });
-  </script>
-</body>
-</html>
+    function getCertPoints(rawName) {
+      if (!rawName) return 200;
+      const s = String(rawName).trim();
+      const direct = CERT_DATABASE.find(c => c.name === s);
+      if (direct) return direct.meters;
+      if (s.includes('分析人員') || s.includes('分析師')) return 800;
+      if (s.includes('托福') || s.includes('雅思')) return 500;
+      if (s.includes('核保') || s.includes('風險管理')) return 400;
+      if (s.includes('外匯') || s.includes('授信') || s.includes('衍生性') || s.includes('高業') || s.includes('高級') || s.includes('多益') || s.includes('碳盤查') || s.includes('永續報告書')) return 350;
+      if (s
