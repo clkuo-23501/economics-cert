@@ -331,7 +331,7 @@
     let islandRootGroup, studentPinsGroup;
     let clickableMeshes = [];
     let labelEntries = [];
-    let directorObj = null, directorQuoteIdx = 0;
+    let directorObj = null, directorHeadAnchor = null, directorQuoteIdx = 0;
     let directorPosCurrent = new THREE.Vector3();
     let directorPosTarget = new THREE.Vector3();
     let cloudMeshes = [];
@@ -363,7 +363,6 @@
       controls.target.set(0, 5.2, 0.8);
       controls.minDistance = 11;
       controls.maxDistance = 52;
-      // 限制最大仰角在水平面以上，徹底防止鏡頭翻轉到地下造成小人倒立
       controls.maxPolarAngle = Math.PI * 0.47;
       controls.minPolarAngle = 0.18;
 
@@ -458,7 +457,6 @@
 
     // 建構立體 3D 繪本浮島
     function buildIslandTerrain() {
-      // 1. 浮島泥土岩盤底座
       const earthGeo = new THREE.CylinderGeometry(BASE_RADIUS * 0.98, 2.2, 5.2, 24);
       const earthMat = new THREE.MeshStandardMaterial({ color: 0x8d6241, roughness: 0.9, flatShading: true });
       const earthMesh = new THREE.Mesh(earthGeo, earthMat);
@@ -472,7 +470,6 @@
       midSoil.position.y = -0.35;
       islandRootGroup.add(midSoil);
 
-      // 2. 浮島頂部綠意草坪台地
       const grassDisc = new THREE.Mesh(
         new THREE.CylinderGeometry(BASE_RADIUS * 1.03, BASE_RADIUS * 1.01, 0.55, 28),
         new THREE.MeshStandardMaterial({ color: 0x79a664, roughness: 0.8, flatShading: true })
@@ -494,7 +491,7 @@
         islandRootGroup.add(m);
       });
 
-      // 3. 玉山主峰核心立體山體
+      // 玉山主峰核心立體山體
       const mainPeak = new THREE.Mesh(
         new THREE.ConeGeometry(8.8, PEAK_HEIGHT, 24, 6),
         new THREE.MeshStandardMaterial({ color: 0x567f48, roughness: 0.82, flatShading: true })
@@ -504,7 +501,7 @@
       mainPeak.receiveShadow = true;
       islandRootGroup.add(mainPeak);
 
-      // 側峰雙子山丘（置於後方兩側，不遮擋正面攀爬步道）
+      // 側峰雙子山丘
       const subPeak1 = new THREE.Mesh(
         new THREE.ConeGeometry(4.4, 6.8, 14),
         new THREE.MeshStandardMaterial({ color: 0x638e53, roughness: 0.85, flatShading: true })
@@ -523,7 +520,7 @@
       subPeak2.receiveShadow = true;
       islandRootGroup.add(subPeak2);
 
-      // 4. 童話糖霜積雪峰頂
+      // 童話糖霜積雪峰頂
       const snowH = PEAK_HEIGHT * 0.28;
       const snowCap = new THREE.Mesh(
         new THREE.ConeGeometry(8.8 * 0.295, snowH, 24),
@@ -532,7 +529,7 @@
       snowCap.position.y = PEAK_HEIGHT + 0.42 - snowH / 2;
       islandRootGroup.add(snowCap);
 
-      // 5. 正面之字形蜿蜒攀登石階（所有同學在同一面依高低排列）
+      // 正面之字形蜿蜒攀登石階
       const stepMat = new THREE.MeshStandardMaterial({ color: 0xf2e9da, roughness: 0.7 });
       const totalSteps = 46;
       for (let i = 0; i <= totalSteps; i++) {
@@ -546,31 +543,30 @@
         islandRootGroup.add(stepMesh);
       }
 
-      // 6. 營地里程碑旗幟（分置正面步道兩側，一目了然）
+      // 高度標示牌推向山體最外側邊緣，遠離中央之字形步道與登山同學
       const milestones = [
-        { t: 0.99, side: 0, label: '🚩 玉山主峰頂 (3,952m)', bg: 'bg-[#e16161] text-white' },
-        { t: 0.84, side: 1.5, label: '⛺ 排雲山莊 (3,402m)', bg: 'bg-[#d97736] text-white' },
-        { t: 0.66, side: -1.6, label: '🌲 白木林觀景台 (2,700m)', bg: 'bg-[#3d6c8f] text-white' },
-        { t: 0.44, side: 1.8, label: '🛖 孟祿亭 (1,800m)', bg: 'bg-[#48783d] text-white' }
+        { t: 0.99, side: 0, poleH: 1.1, label: '🚩 玉山主峰頂 (3,952m)', bg: 'bg-[#e16161] text-white' },
+        { t: 0.84, side: 2.3, poleH: 1.0, label: '⛺ 排雲山莊 (3,402m)', bg: 'bg-[#d97736] text-white' },
+        { t: 0.66, side: -3.5, poleH: 1.05, label: '🌲 白木林觀景台 (2,700m)', bg: 'bg-[#3d6c8f] text-white' },
+        { t: 0.44, side: 4.8, poleH: 1.1, label: '🛖 孟祿亭 (1,800m)', bg: 'bg-[#48783d] text-white' }
       ];
       milestones.forEach(m => {
-        const p = getFrontSlopePosition(m.t, m.side, 0.35);
+        const p = getFrontSlopeEdgePosition(m.t, m.side, 0.25);
         const anchor = new THREE.Object3D();
-        anchor.position.copy(p);
+        anchor.position.set(p.x, p.y + m.poleH, p.z);
         islandRootGroup.add(anchor);
 
         const pole = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.05, 0.05, 0.85, 8),
+          new THREE.CylinderGeometry(0.05, 0.05, m.poleH, 8),
           new THREE.MeshStandardMaterial({ color: 0x6e472b })
         );
-        pole.position.copy(p);
-        pole.position.y += 0.35;
+        pole.position.set(p.x, p.y + m.poleH / 2, p.z);
         islandRootGroup.add(pole);
 
-        register3DLabel(anchor, m.label, `px-2 py-0.5 rounded-full text-[9px] font-black shadow-xs whitespace-nowrap ${m.bg}`, 20, false);
+        register3DLabel(anchor, m.label, `px-2 py-0.5 rounded-full text-[9px] font-black shadow-xs whitespace-nowrap ${m.bg}`, 4, false);
       });
 
-      // 7. 島嶼邊緣繪本圓潤小樹叢
+      // 島嶼邊緣繪本圓潤小樹叢
       [
         { x: -8.8, z: 4.5, s: 1.0 }, { x: -7.6, z: 6.4, s: 0.8 },
         { x: 8.6, z: 4.8, s: 1.1 }, { x: 7.4, z: 6.6, s: 0.85 },
@@ -593,7 +589,7 @@
         islandRootGroup.add(tree);
       });
 
-      // 8. 漂浮棉花糖 3D 雲朵
+      // 漂浮棉花糖 3D 雲朵
       const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, flatShading: true });
       [
         { x: -11.5, y: 12.5, z: -4, s: 1.1 },
@@ -616,24 +612,17 @@
     }
 
     /**
-     * 計算正面山坡之字形（S型）登山座標
-     * 所有學生都分布於面向鏡頭的正面山坡（+Z 側），同一畫面一眼看清高低進度
-     * @param {number} t - 0 ~ 1（對應 0m ~ 3952m）
-     * @param {number} lateralJitter - 左右微調避免重疊
-     * @param {number} radialOffset - 貼近山坡表面的法向微調
+     * 計算正面山坡之字形（S型）登山座標（供石階與學生公仔使用）
      */
     function getFrontSlopePosition(t, lateralJitter = 0, radialOffset = 0.25) {
       const clampedT = THREE.MathUtils.clamp(t, 0, 0.985);
       const y = 0.55 + clampedT * (PEAK_HEIGHT - 0.35);
 
-      // 隨高度往上，左右擺盪幅度自然收斂，貼合圓錐山體輪廓
       const coneRadiusAtY = 8.8 * (1 - clampedT * 0.95);
-      const maxSwing = coneRadiusAtY * 0.72;
-      // 之字形 S 曲線（從山腳一路向上盤旋 2.5 個轉折）
+      const maxSwing = coneRadiusAtY * 0.62;
       const zigZagX = Math.sin(clampedT * Math.PI * 2.5) * maxSwing;
       const x = THREE.MathUtils.clamp(zigZagX + lateralJitter, -maxSwing * 1.15, maxSwing * 1.15);
 
-      // 依據圓錐方程式 r^2 = x^2 + z^2，求取正面 (+Z) 山坡表面深度
       const surfaceR = (clampedT === 0 ? 9.4 : coneRadiusAtY + 0.32) + radialOffset;
       const zSq = Math.max(0.25, surfaceR * surfaceR - x * x);
       const z = Math.sqrt(zSq);
@@ -641,7 +630,20 @@
       return new THREE.Vector3(x, y, z);
     }
 
-    // 建立 3D 木偶公仔人物（修正女生頭髮方向，開口朝臉部前方，絕不遮臉）
+    /**
+     * 計算山坡最外側邊緣座標（專供高度標示木樁使用，遠離中央步道）
+     */
+    function getFrontSlopeEdgePosition(t, targetX = 0, radialOffset = 0.25) {
+      const clampedT = THREE.MathUtils.clamp(t, 0, 0.99);
+      const y = 0.55 + clampedT * (PEAK_HEIGHT - 0.35);
+      const coneRadiusAtY = 8.8 * (1 - clampedT * 0.95);
+      const surfaceR = coneRadiusAtY + radialOffset;
+      const x = THREE.MathUtils.clamp(targetX, -surfaceR * 0.95, surfaceR * 0.95);
+      const z = Math.sqrt(Math.max(0.15, surfaceR * surfaceR - x * x));
+      return new THREE.Vector3(x, y, z);
+    }
+
+    // 建立 3D 木偶公仔人物（附帶頭頂 3D 標籤錨點）
     function create3DCharacterMesh(isFemale, shirtHex) {
       const group = new THREE.Group();
       const skinMat = new THREE.MeshStandardMaterial({ color: 0xfed7aa, roughness: 0.65 });
@@ -650,7 +652,6 @@
       const pantsMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 });
       const shoeMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
 
-      // 雙腿與白鞋
       const legGeo = new THREE.CylinderGeometry(0.11, 0.1, 0.42, 10);
       const legL = new THREE.Mesh(legGeo, pantsMat);
       legL.position.set(-0.13, 0.25, 0);
@@ -663,12 +664,10 @@
       const shoeR = new THREE.Mesh(shoeGeo, shoeMat);
       shoeR.position.set(0.13, 0.05, 0.04);
 
-      // 身體上衣
       const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.28, 0.55, 14), shirtMat);
       torso.position.y = 0.72;
       torso.castShadow = true;
 
-      // 雙手
       const armGeo = new THREE.CylinderGeometry(0.075, 0.075, 0.4, 8);
       const armL = new THREE.Mesh(armGeo, skinMat);
       armL.position.set(-0.33, 0.72, 0);
@@ -677,12 +676,10 @@
       armR.position.set(0.33, 0.72, 0);
       armR.rotation.z = -0.18;
 
-      // 圓潤木偶頭部（正面朝向 +Z）
       const head = new THREE.Mesh(new THREE.SphereGeometry(0.34, 18, 16), skinMat);
       head.position.y = 1.32;
       head.castShadow = true;
 
-      // 雙眼與粉嫩腮紅（位於 +Z 臉部正面）
       const eyeGeo = new THREE.SphereGeometry(0.036, 8, 8);
       const eyeL = new THREE.Mesh(eyeGeo, hairMat);
       eyeL.position.set(-0.11, 1.31, 0.31);
@@ -697,7 +694,6 @@
       const blushR = blushL.clone();
       blushR.position.set(0.18, 1.24, 0.29);
 
-      // 頭頂黑髮（略向後腦傾斜，露出完整臉蛋與額頭瀏海）
       const hairCap = new THREE.Mesh(
         new THREE.SphereGeometry(0.365, 18, 14, 0, Math.PI * 2, 0, Math.PI * 0.54),
         hairMat
@@ -707,7 +703,6 @@
       group.add(hairCap);
 
       if (isFemale) {
-        // 女生齊肩短髮（Three.js Cylinder theta=0 在 +Z 正前方，因此從 thetaStart = PI*0.32 開始繞過後方到 PI*1.68，正前方保持敞開露臉）
         const sideHairGeo = new THREE.CylinderGeometry(
           0.355,
           0.385,
@@ -723,11 +718,17 @@
         group.add(sideHair);
       }
 
+      // 頭頂上方專屬 3D 錨點（y = 1.85），保證縮放時名牌永遠浮在頭頂上方不遮臉
+      const headAnchor = new THREE.Object3D();
+      headAnchor.position.set(0, 1.85, 0);
+      group.add(headAnchor);
+      group.userData.headAnchor = headAnchor;
+
       group.add(legL, legR, shoeL, shoeR, torso, armL, armR, head, eyeL, eyeR, blushL, blushR);
       return group;
     }
 
-    // 建立 3D 系主任 NPC
+    // 建立 3D 系主任 NPC（附帶頭頂 3D 氣泡錨點）
     function buildDirector3D() {
       directorObj = new THREE.Group();
       const skinMat = new THREE.MeshStandardMaterial({ color: 0xfed7aa, roughness: 0.65 });
@@ -771,11 +772,16 @@
       const eyeR = eyeL.clone();
       eyeR.position.set(0.13, 1.57, 0.37);
 
+      // 主任頭頂上方專屬錨點（y = 2.15），氣泡與「系主任」標籤永遠在頭頂之上不遮臉
+      directorHeadAnchor = new THREE.Object3D();
+      directorHeadAnchor.position.set(0, 2.15, 0);
+      directorObj.add(directorHeadAnchor);
+
       directorObj.add(legL, legR, suit, tieShirt, armL, armR, head, hair, eyeL, eyeR);
       directorObj.scale.setScalar(1.22);
       directorObj.userData.isDirector = true;
 
-      const startPos = getFrontSlopePosition(0.55, 0.9, 0.35);
+      const startPos = getFrontSlopePosition(0.55, 1.6, 0.32);
       directorPosCurrent.copy(startPos);
       directorPosTarget.copy(startPos);
       directorObj.position.copy(startPos);
@@ -784,7 +790,7 @@
       clickableMeshes.push(directorObj);
     }
 
-    function register3DLabel(obj3D, htmlContent, className, offsetY = 26, isInteractive = false, onClick = null) {
+    function register3DLabel(obj3D, htmlContent, className, offsetY = 6, isInteractive = false, onClick = null) {
       const overlay = document.getElementById('labels-3d-overlay');
       const el = document.createElement('div');
       el.className = `absolute transform -translate-x-1/2 -translate-y-full select-none ${className}`;
@@ -810,16 +816,21 @@
     }
 
     function startDirectorPatrol() {
-      const patrolTs = [0.18, 0.38, 0.55, 0.74, 0.90];
+      // 讓主任沿著步道外側巡山，避免遮擋步道上的同學
+      const patrolSpots = [
+        { t: 0.22, side: -2.2 },
+        { t: 0.36, side: 2.1 },
+        { t: 0.55, side: 1.6 },
+        { t: 0.74, side: -1.5 },
+        { t: 0.91, side: 0.9 }
+      ];
       setInterval(() => {
-        const t = patrolTs[Math.floor(Math.random() * patrolTs.length)];
-        const sideJitter = (Math.random() - 0.5) * 1.4;
-        directorPosTarget.copy(getFrontSlopePosition(t, sideJitter, 0.35));
+        const spot = patrolSpots[Math.floor(Math.random() * patrolSpots.length)];
+        directorPosTarget.copy(getFrontSlopePosition(spot.t, spot.side, 0.32));
         cycleDirectorQuote();
       }, 14000);
     }
 
-    // 依篩選結果在正面山坡重建 3D 學生公仔與名牌
     function rebuild3DStudents(list) {
       if (!studentPinsGroup) return;
 
@@ -837,9 +848,9 @@
         return true;
       });
 
-      if (!directorBubbleEl && directorObj) {
+      if (!directorBubbleEl && directorHeadAnchor) {
         directorBubbleEl = register3DLabel(
-          directorObj,
+          directorHeadAnchor,
           `<div class="flex flex-col items-center">
             <div class="bg-[#fcd472] text-[#3c2a13] text-[9px] sm:text-[11px] font-black px-2.5 py-1 rounded-2xl shadow-md border border-white whitespace-nowrap mb-0.5">
               <span id="director-quote-3d">${DIRECTOR_QUOTES[0]}</span>
@@ -847,13 +858,12 @@
             <span class="bg-[#3d4a39] text-[#fcd472] border border-[#fcd472]/40 text-[8px] sm:text-[9px] px-2 py-0.2 rounded-full font-bold shadow-xs">系主任</span>
           </div>`,
           'speech-bubble-3d z-30',
-          46,
+          6,
           true,
           cycleDirectorQuote
         );
       }
 
-      // 統計同高度層級人數，讓同海拔多位同學左右排開不重疊
       const tierBuckets = {};
 
       list.forEach((st, idx) => {
@@ -865,8 +875,7 @@
         const slotIdx = tierBuckets[tierKey] || 0;
         tierBuckets[tierKey] = slotIdx + 1;
 
-        // 0m 登山口草坪寬廣，左右排開幅度較大；越高處隨山體收斂
-        const spreadUnit = altitude === 0 ? 0.55 : 0.45;
+        const spreadUnit = altitude === 0 ? 0.58 : 0.48;
         const signedOffset = (slotIdx % 2 === 0 ? 1 : -1) * Math.ceil(slotIdx / 2) * spreadUnit;
         const heightJitter = altitude === 0 ? ((slotIdx % 3) * 0.012) : 0;
 
@@ -876,7 +885,6 @@
 
         const charMesh = create3DCharacterMesh(isFemale, conf.shirt);
         charMesh.position.copy(pos);
-        // 公仔正面朝向鏡頭前方 (+Z)
         charMesh.lookAt(pos.x, pos.y, pos.z + 10);
         charMesh.userData.student = st;
         charMesh.userData.phase = idx * 0.7;
@@ -884,13 +892,14 @@
         studentPinsGroup.add(charMesh);
         clickableMeshes.push(charMesh);
 
+        // 掛載在頭頂錨點 headAnchor 上方 6px，放大縮小都穩穩浮在頭頂之上
         const labelEl = register3DLabel(
-          charMesh,
+          charMesh.userData.headAnchor,
           `<div class="px-1.5 py-0.2 rounded-full text-[8px] sm:text-[9px] font-black text-white shadow-xs whitespace-nowrap ${conf.badge} hover:scale-110 transition">
             ${st.name} ${certCount > 0 ? `(${certCount})` : ''}
           </div>`,
           'z-20',
-          34,
+          6,
           true,
           () => openStudentModal(st)
         );
